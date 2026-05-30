@@ -1,6 +1,14 @@
 # VISION — DSA Self-Study Platform ("lootcode")
 
-**Status: M0 + M1 complete — awaiting milestone checkpoint review**
+**Status: Full-autopilot build in progress (approved). Building all topics, final review at end.**
+
+### Build progress log
+- ✅ M0 Foundation + M1 Arrays & Hashing (3 problems)
+- ✅ Two Pointers (3) · Sliding Window (3) · Binary Search (3) — verify 12/12 green
+- ⏳ Next: Stack · Queues & Deques · Linked Lists · Trees · Tries · Heap/PQ · Backtracking ·
+  Graphs · Advanced Graphs · 1-D DP · 2-D DP · Greedy · Intervals · Math & Bit · Union-Find
+- To resume: check `lib/curriculum.ts` for built topics; each topic = tutorial + 2–3 problems
+  with py+js references; run `npm run verify` (must stay green) then commit.
 
 ## Vision
 
