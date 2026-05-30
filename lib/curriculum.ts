@@ -3,6 +3,9 @@ import arraysHashing from './content/arrays-hashing';
 import twoPointers from './content/two-pointers';
 import slidingWindow from './content/sliding-window';
 import binarySearch from './content/binary-search';
+import stack from './content/stack';
+import queuesDeques from './content/queues-deques';
+import linkedLists from './content/linked-lists';
 
 // The curriculum manifest: built topics in study order.
 // Add a topic by importing its module and appending it here.
@@ -11,6 +14,9 @@ export const TOPICS: Topic[] = [
   twoPointers,
   slidingWindow,
   binarySearch,
+  stack,
+  queuesDeques,
+  linkedLists,
 ].sort((a, b) => a.order - b.order);
 
 // Full planned curriculum (for the landing-page roadmap). Built topics are
