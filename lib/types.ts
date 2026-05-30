@@ -9,7 +9,8 @@ export type Difficulty = 'Easy' | 'Medium' | 'Hard';
 /** How a test's actual output is compared against `expected`. */
 export type CompareMode =
   | 'deep' // strict deep equality (default)
-  | 'unordered'; // deep equality after recursively sorting arrays (order-insensitive)
+  | 'unordered' // deep equality after recursively sorting arrays (fully order-insensitive)
+  | 'unorderedOuter'; // top-level array order-insensitive, but inner elements compared as-is
 
 export interface TestCase {
   /** Positional arguments passed to the solution function. */

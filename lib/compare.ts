@@ -18,8 +18,19 @@ function sortDeep(value: unknown): unknown {
   return value;
 }
 
+function sortOuter(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value
+      .slice()
+      .sort((a, b) => (JSON.stringify(a) < JSON.stringify(b) ? -1 : 1));
+  }
+  return value;
+}
+
 function normalize(value: unknown, mode: CompareMode): unknown {
-  return mode === 'unordered' ? sortDeep(value) : value;
+  if (mode === 'unordered') return sortDeep(value);
+  if (mode === 'unorderedOuter') return sortOuter(value);
+  return value;
 }
 
 /** Compare an actual result against expected under the given compare mode. */
