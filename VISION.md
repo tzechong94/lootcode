@@ -13,8 +13,8 @@ Static Next.js DSA platform: 20 topics, 63 problems, dual-language (Python/JS) i
 ### Build progress
 - ✅ T-01 schema · T-02 Stepper + array/grid renderers · T-03 hash renderer (others built per-topic on demand)
 - ✅ T-04 pilot: arrays-hashing + two-pointers rebuilt (first-principles prose + interactive concept viz)
-- ✅ Interactive done (13/20): + trees, tries, heap, graphs, advanced-graphs, backtracking.
-- ⏳ Remaining 7 topics: sorting-divide-conquer, dp-1d, dp-2d, greedy, intervals, math-bit, union-find.
+- ✅ Interactive done (16/20): + trees, tries, heap, graphs, advanced-graphs, backtracking, dp-1d, dp-2d, greedy.
+- ⏳ Remaining 4 topics: sorting-divide-conquer, intervals, math-bit, union-find. Then final ship check.
 - Renderers built: array, grid, hash, tree, list, stack/queue, bits, graph, interval (full library complete).
 
 ### User-requested content additions (fold in as topics are built)
