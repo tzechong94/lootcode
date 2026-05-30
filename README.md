@@ -1,10 +1,17 @@
 # lootcode
 
 A static, browser-based platform for self-studying **data structures & algorithms** and getting
-interview-ready. It's **tutorial-first**: each topic opens with a concise, first-principles lesson,
-then a few problems you solve in an in-browser editor — write **Python or JavaScript**, run it
-against real tests, and see pass/fail. Everything runs client-side (Python via Pyodide, JS via a Web
-Worker), so it deploys as a static site with no backend.
+interview-ready. It's **tutorial-first**: each topic opens with a first-principles lesson — prose
+interleaved with **interactive concept visualizers** (step through a hash table filling, a binary
+search halving its range, BFS expanding in rings, a heap sifting, union-find merging sets) — then a
+few problems you solve in an in-browser editor: write **Python or JavaScript**, run it against real
+tests, and see pass/fail. Everything runs client-side (Python via Pyodide, JS via a Web Worker), so
+it deploys as a static site with no backend.
+
+The visualizers are built from a small reusable library (`components/viz/`): a generic `<Stepper>`
+(prev/next/play) plus renderers for arrays, grids, trees, linked lists, stacks/queues, hash buckets,
+bits, graphs, and timelines. A topic's tutorial is an ordered list of blocks (`{kind:'md'}` /
+`{kind:'viz'}`) in its content module — see `lib/types.ts` (`TutorialBlock`, `VizSpec`).
 
 ## Curriculum
 
