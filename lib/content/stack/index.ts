@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 const tutorial = `
 ## Stack — first principles
@@ -51,12 +51,65 @@ stack — useful for iterative tree/graph traversal and to avoid stack-overflow 
 - The call stack means every recursion has an equivalent explicit-stack iterative form.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Stack — from first principles
+
+A stack imposes one rule: you may only add or remove at **one end**, the top. Last in, first out
+(**LIFO**). That restriction sounds limiting, but it's *exactly* the structure of anything **nested**
+or anything where the **most recent** unfinished thing must be resolved first — matching brackets,
+undo history, the function call stack, parsing expressions.
+
+Because all the action is at one end, \`push\` and \`pop\` are both **O(1)** — in code a stack is just a
+dynamic array (\`append\`/\`pop\` in Python, \`push\`/\`pop\` in JS); you rarely need a special class. Watch
+the LIFO discipline:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'stack',
+      title: 'A stack: push and pop only at the top (LIFO)',
+      frames: [
+        { caption: 'An empty stack. We can only ever touch the top.', items: [] },
+        { caption: 'push(A) — A is the only, and top, element.', items: ['A'], highlight: [0] },
+        { caption: 'push(B) — it goes on top of A.', items: ['A', 'B'], highlight: [1] },
+        { caption: 'push(C) — C is now the top.', items: ['A', 'B', 'C'], highlight: [2] },
+        { caption: 'pop() removes the most recently pushed — C. That is LIFO.', items: ['A', 'B'] },
+        { caption: 'pop() again → B. Always the top, always O(1).', items: ['A'] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `### Two signals that scream "stack"
+
+1. **Matching / nesting** — push when you open something, pop when you close it, and check the popped
+   item is the expected counterpart (parentheses, tags, nested structures).
+2. **"Resolve the most recent unresolved element"** — scanning left to right where each new element
+   settles earlier ones. This is the **monotonic stack**: keep the stack's values in sorted order, and
+   before pushing a new value, pop everything it "beats" — each popped element has just found its
+   *next greater* (or smaller) neighbor. Every index is pushed and popped at most once, so it's O(n).
+
+And since the call stack *is* a stack, any recursion can be rewritten iteratively with an explicit one.
+
+### Key points to remember
+
+- Stack = LIFO; push/pop/peek are all O(1) on a dynamic array.
+- Reach for it on **matching/nesting** problems and "resolve the most recent element" scans.
+- A **monotonic stack** answers next-greater / next-smaller in O(n) — each index pushed and popped once.
+- When you pop on a match, verify the popped element is the expected counterpart.
+- Every recursion has an equivalent explicit-stack iterative form.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'stack',
   title: 'Stack',
   order: 5,
   blurb: 'LIFO structure for matching/nesting and the monotonic-stack "next greater element" pattern.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'valid-parentheses',

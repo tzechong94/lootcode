@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 const PREAMBLE_PY = `class ListNode:
     def __init__(self, val=0, next=None):
@@ -89,12 +89,104 @@ A two-pointer gap of \`n\` also lets you find the \`n\`-th node from the end in 
 - Draw the pointers. Most linked-list bugs are one mis-ordered assignment.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Linked Lists — from first principles
+
+To really get linked lists, compare them to arrays at the level of **memory**.
+
+An **array** is one **contiguous** block. Because the elements are packed side by side at a fixed
+size, the address of element \`i\` is just \`base + i × size\` — the machine computes it and jumps. That's
+why \`a[i]\` is **O(1)**. The price: to insert or delete in the middle, every later element must shift
+over to keep the block contiguous — **O(n)**.`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'array',
+      title: 'Array: contiguous memory — O(1) index, O(n) middle-insert',
+      frames: [
+        { caption: 'An array is one contiguous block. Element i lives at address base + i × size.', cells: [{ value: 10 }, { value: 20 }, { value: 30 }, { value: 40 }] },
+        { caption: 'Random access by index is O(1): compute the address and jump straight to it.', cells: [{ value: 10 }, { value: 20 }, { value: 30, state: 'active' }, { value: 40 }] },
+        { caption: 'But insert in the middle and every later element must shift right to stay contiguous → O(n).', cells: [{ value: 10 }, { value: 99, state: 'match' }, { value: 20, state: 'compare' }, { value: 30, state: 'compare' }, { value: 40, state: 'compare' }] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `A **linked list** makes the opposite trade. Each value lives in its own **node** that also stores a
+**pointer** to the next node. Nodes can sit *anywhere* in memory — they're stitched together by
+pointers, not by adjacency. So there's no address arithmetic: to reach the k-th node you must **walk**
+the pointers from the head (**O(n)** access). But inserting or deleting, once you're holding the spot,
+is just relinking a couple of pointers — **O(1)**, nothing shifts.`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'list',
+      title: 'Linked list: scattered nodes + pointers — O(n) access, O(1) splice',
+      frames: [
+        { caption: 'Each node holds a value and a pointer to the next. Nodes need not be contiguous in memory.', nodes: [{ value: 10 }, { value: 20 }, { value: 30 }, { value: 40 }], pointers: [{ name: 'head', index: 0 }] },
+        { caption: 'No addresses to compute — to reach the k-th node you walk the pointers → O(n) access.', nodes: [{ value: 10, state: 'dim' }, { value: 20, state: 'dim' }, { value: 30, state: 'active' }, { value: 40 }], pointers: [{ name: 'cur', index: 2 }] },
+        { caption: 'Insert once you hold the spot: make a node and relink two pointers. O(1) — nothing shifts.', nodes: [{ value: 10 }, { value: 20 }, { value: 99, state: 'match' }, { value: 30 }, { value: 40 }], pointers: [] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `So: arrays win on random access and cache-friendliness; linked lists win when you're constantly
+splicing nodes in and out and don't need indexing. Interviewers love them because they force precise
+pointer reasoning.
+
+> In these problems the I/O is an array for convenience, but a real \`ListNode\` is built for you
+> (\`build_list\` / \`buildList\`) and you return one via \`to_array\` / \`toArray\`. Write genuine pointer
+> logic in between.
+
+### The three techniques that cover most problems
+
+**1. Dummy (sentinel) head** — a fake node before the real head, so "modifying the first node" stops
+being a special case. Build your result off the dummy and return \`dummy.next\`.
+
+**2. Iterative reversal** — carry \`prev\`; at each node save \`next\`, point \`cur.next\` back at \`prev\`,
+then advance. O(n) time, O(1) space. Step through it:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'list',
+      title: 'Reversing a list in one pass (prev / cur)',
+      frames: [
+        { caption: 'Goal: flip every pointer to face backward. Start with prev = null, cur = node 1.', nodes: [{ value: 1 }, { value: 2 }, { value: 3 }], pointers: [{ name: 'prev', index: null }, { name: 'cur', index: 0 }] },
+        { caption: "Point node 1's next at prev (null) — it becomes the new tail. Advance: prev = 1, cur = 2.", nodes: [{ value: 1, state: 'done' }, { value: 2 }, { value: 3 }], pointers: [{ name: 'prev', index: 0 }, { name: 'cur', index: 1 }] },
+        { caption: 'Point node 2 back at node 1. prev = 2, cur = 3.', nodes: [{ value: 1, state: 'done' }, { value: 2, state: 'done' }, { value: 3 }], pointers: [{ name: 'prev', index: 1 }, { name: 'cur', index: 2 }] },
+        { caption: 'Point node 3 back at node 2. cur falls off the end — done. The new head is prev = node 3.', nodes: [{ value: 1, state: 'done' }, { value: 2, state: 'done' }, { value: 3, state: 'done' }], pointers: [{ name: 'prev', index: 2 }, { name: 'cur', index: null }] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `**3. Fast & slow pointers (Floyd's)** — one pointer steps once, another twice. They find the
+**middle** in a single pass, and detect a **cycle** (if fast ever meets slow). A fixed *gap* of \`n\`
+between two pointers also finds the n-th node from the end in one pass.
+
+### Key points to remember
+
+- Array = contiguous memory: O(1) index, O(n) middle-insert. Linked list = scattered nodes + pointers: O(n) access, O(1) splice.
+- Always save \`node.next\` **before** overwriting it, or you lose the rest of the list.
+- A **dummy head** removes head-modification edge cases — use it whenever the head might change.
+- **Fast/slow** pointers find the middle and detect cycles in O(1) space.
+- Draw the pointers — most linked-list bugs are one mis-ordered assignment.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'linked-lists',
   title: 'Linked Lists',
   order: 7,
   blurb: 'Pointer manipulation: dummy heads, in-place reversal, and fast/slow two-pointer tricks.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'reverse-linked-list',

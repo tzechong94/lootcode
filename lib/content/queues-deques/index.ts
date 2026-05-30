@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 const tutorial = `
 ## Queues & Deques — first principles
@@ -48,12 +48,64 @@ Each index enters and leaves the deque once ⇒ **O(n)** total, versus O(n·k) f
 - Fixed-size windows (moving averages, recent-call counts) are a queue that you trim from the front by an age/size rule.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Queues & Deques — from first principles
+
+A queue flips the stack's rule: you add at the **back** and remove from the **front** — first in,
+first out (**FIFO**). Where a stack models "handle the most recent thing," a queue models **fair,
+in-order processing**: whatever arrived earliest is served first. That's the natural structure for
+**breadth-first search**, level-order traversal, and any "process in arrival order" task.`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'queue',
+      title: 'A queue: enqueue at the back, dequeue from the front (FIFO)',
+      frames: [
+        { caption: 'An empty queue. Add at the back, remove from the front.', items: [] },
+        { caption: 'enqueue(A).', items: ['A'], highlight: [0] },
+        { caption: 'enqueue(B) — joins the back of the line.', items: ['A', 'B'], highlight: [1] },
+        { caption: 'enqueue(C).', items: ['A', 'B', 'C'], highlight: [2] },
+        { caption: 'dequeue() removes the front — A, the one that waited longest. FIFO.', items: ['B', 'C'] },
+        { caption: 'dequeue() → B. The opposite order from a stack.', items: ['C'] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `### Implement it efficiently
+
+Removing from the front of a plain array is O(n) (everything shifts). Use Python's
+\`collections.deque\` (\`append\`/\`popleft\` are O(1)); in JS, keep an array with a moving \`head\` index and
+only advance it — never \`shift()\` in a hot loop.
+
+### The deque and the monotonic-deque trick
+
+A **double-ended queue** allows O(1) push/pop at *both* ends. Its killer application is the
+**monotonic deque**: to track the maximum of every length-\`k\` window in O(n), keep a deque of indices
+whose values are decreasing — pop smaller values off the back before adding a new one (they can never
+be the max again), and drop the front when it slides out of the window. The front is always the
+current window's maximum, and each index enters and leaves once.
+
+### Key points to remember
+
+- Queue = FIFO; the backbone of BFS and level-by-level processing.
+- Never \`shift()\` a JS array in a loop (O(n)); use a head index or a deque. Python: \`collections.deque\`.
+- A deque adds/removes at both ends in O(1) — a superset of both stack and queue.
+- A **monotonic deque** gives O(n) sliding-window min/max.
+- Fixed-size windows (recent counts, moving averages) are a queue you trim from the front by an age/size rule.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'queues-deques',
   title: 'Queues & Deques',
   order: 6,
   blurb: 'FIFO processing for BFS, plus the monotonic deque for O(n) sliding-window extremes.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'implement-queue-using-stacks',
