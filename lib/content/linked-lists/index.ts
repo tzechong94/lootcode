@@ -206,6 +206,51 @@ const topic: Topic = {
       ],
       complexity: { time: 'O(n)', space: 'O(1)' },
     },
+    {
+      id: 'design-doubly-linked-list',
+      title: 'Design a Doubly Linked List',
+      difficulty: 'Medium',
+      topicSlug: 'linked-lists',
+      statement: `Implement a doubly linked list with sentinel head/tail. Support \`addAtHead(v)\`, \`addAtTail(v)\`, \`addAtIndex(i, v)\` (insert before index \`i\`; if \`i\` equals the length, append; if \`i > length\`, do nothing), \`get(i)\` (value at index \`i\`, or \`-1\`), and \`deleteAtIndex(i)\`. (CSPrimer's "Doubly linked list".)
+
+You are given operations like \`["addAtHead", 1]\`, \`["addAtIndex", 1, 2]\`, \`["get", 1]\`, \`["deleteAtIndex", 1]\`. Return a list with each operation's result: \`null\` for mutations, the value (or \`-1\`) for \`get\`.`,
+      constraints: ['0 ≤ index, val ≤ 1000', '≤ 2000 operations'],
+      examples: [
+        {
+          input: 'ops = [["addAtHead",1],["addAtTail",3],["addAtIndex",1,2],["get",1],["deleteAtIndex",1],["get",1]]',
+          output: '[null,null,null,2,null,3]',
+        },
+      ],
+      functionName: { py: 'linked_list_ops', js: 'linkedListOps' },
+      starter: {
+        py: 'def linked_list_ops(ops):\n    out = []\n    # build a doubly linked list with sentinel head/tail and a size counter\n    for op in ops:\n        name = op[0]\n        # your code here\n        pass\n    return out\n',
+        js: 'function linkedListOps(ops) {\n  const out = [];\n  // build a doubly linked list with sentinel head/tail and a size counter\n  for (const op of ops) {\n    const name = op[0];\n    // your code here\n  }\n  return out;\n}\n',
+      },
+      reference: {
+        py: "def linked_list_ops(ops):\n    class Node:\n        def __init__(self, val):\n            self.val = val\n            self.prev = None\n            self.next = None\n    head, tail = Node(0), Node(0)\n    head.next = tail\n    tail.prev = head\n    size = 0\n    out = []\n    def node_at(index):\n        cur = head.next\n        for _ in range(index):\n            cur = cur.next\n        return cur\n    for op in ops:\n        name = op[0]\n        if name == 'get':\n            i = op[1]\n            out.append(node_at(i).val if 0 <= i < size else -1)\n        elif name == 'addAtHead':\n            nxt = head.next\n            node = Node(op[1])\n            head.next = node; node.prev = head; node.next = nxt; nxt.prev = node\n            size += 1\n            out.append(None)\n        elif name == 'addAtTail':\n            prev = tail.prev\n            node = Node(op[1])\n            prev.next = node; node.prev = prev; node.next = tail; tail.prev = node\n            size += 1\n            out.append(None)\n        elif name == 'addAtIndex':\n            i, val = op[1], op[2]\n            if i > size:\n                out.append(None)\n                continue\n            if i < 0:\n                i = 0\n            nxt = node_at(i) if i < size else tail\n            prev = nxt.prev\n            node = Node(val)\n            prev.next = node; node.prev = prev; node.next = nxt; nxt.prev = node\n            size += 1\n            out.append(None)\n        elif name == 'deleteAtIndex':\n            i = op[1]\n            if 0 <= i < size:\n                node = node_at(i)\n                node.prev.next = node.next\n                node.next.prev = node.prev\n                size -= 1\n            out.append(None)\n    return out\n",
+        js: "function linkedListOps(ops) {\n  const make = (val) => ({ val, prev: null, next: null });\n  const head = make(0), tail = make(0);\n  head.next = tail;\n  tail.prev = head;\n  let size = 0;\n  const out = [];\n  const nodeAt = (index) => {\n    let cur = head.next;\n    for (let k = 0; k < index; k++) cur = cur.next;\n    return cur;\n  };\n  for (const op of ops) {\n    const name = op[0];\n    if (name === 'get') {\n      const i = op[1];\n      out.push(i >= 0 && i < size ? nodeAt(i).val : -1);\n    } else if (name === 'addAtHead') {\n      const nxt = head.next;\n      const node = make(op[1]);\n      head.next = node; node.prev = head; node.next = nxt; nxt.prev = node;\n      size++;\n      out.push(null);\n    } else if (name === 'addAtTail') {\n      const prev = tail.prev;\n      const node = make(op[1]);\n      prev.next = node; node.prev = prev; node.next = tail; tail.prev = node;\n      size++;\n      out.push(null);\n    } else if (name === 'addAtIndex') {\n      let i = op[1];\n      const val = op[2];\n      if (i > size) { out.push(null); continue; }\n      if (i < 0) i = 0;\n      const nxt = i < size ? nodeAt(i) : tail;\n      const prev = nxt.prev;\n      const node = make(val);\n      prev.next = node; node.prev = prev; node.next = nxt; nxt.prev = node;\n      size++;\n      out.push(null);\n    } else if (name === 'deleteAtIndex') {\n      const i = op[1];\n      if (i >= 0 && i < size) {\n        const node = nodeAt(i);\n        node.prev.next = node.next;\n        node.next.prev = node.prev;\n        size--;\n      }\n      out.push(null);\n    }\n  }\n  return out;\n}\n",
+      },
+      tests: [
+        {
+          input: [[['addAtHead', 1], ['addAtTail', 3], ['addAtIndex', 1, 2], ['get', 1], ['deleteAtIndex', 1], ['get', 1]]],
+          expected: [null, null, null, 2, null, 3],
+        },
+        {
+          input: [[['addAtHead', 7], ['addAtHead', 2], ['addAtHead', 1], ['addAtIndex', 3, 0], ['deleteAtIndex', 2], ['addAtHead', 6], ['get', 3]]],
+          expected: [null, null, null, null, null, null, 0],
+        },
+        {
+          input: [[['get', 0], ['addAtTail', 5], ['get', 0], ['get', 1]]],
+          expected: [-1, null, 5, -1],
+        },
+      ],
+      hints: [
+        'Sentinel head and tail nodes remove edge cases — every real node has a prev and next.',
+        'Inserting a node between prev and nxt is four pointer assignments; keep a size counter.',
+        'addAtIndex with index == size appends; index > size is a no-op.',
+      ],
+      complexity: { time: 'O(index) per op', space: 'O(n)' },
+    },
   ],
 };
 

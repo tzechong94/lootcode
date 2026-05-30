@@ -171,6 +171,40 @@ You are given a list of operations; each is one of \`["push", x]\`, \`["pop"]\`,
       ],
       complexity: { time: 'O(n)', space: 'O(n)' },
     },
+    {
+      id: 'basic-calculator',
+      title: 'Basic Calculator',
+      difficulty: 'Hard',
+      topicSlug: 'stack',
+      statement: `Evaluate a string \`s\` representing a valid arithmetic expression containing non-negative integers, \`+\`, \`-\`, parentheses \`(\` \`)\`, and spaces. Return its integer value. (CSPrimer's "Basic calculator".)`,
+      constraints: ['1 ≤ s.length ≤ 3·10⁵', "s consists of digits, '+', '-', '(', ')', and ' '.", 'The expression is always valid.'],
+      examples: [
+        { input: 's = "1 + 1"', output: '2' },
+        { input: 's = "(1+(4+5+2)-3)+(6+8)"', output: '23' },
+      ],
+      functionName: { py: 'calculate', js: 'calculate' },
+      starter: {
+        py: 'def calculate(s):\n    # use a stack to remember the result/sign before each "("\n    # your code here\n    pass\n',
+        js: 'function calculate(s) {\n  // use a stack to remember the result/sign before each "("\n  // your code here\n}\n',
+      },
+      reference: {
+        py: "def calculate(s):\n    result = 0\n    sign = 1\n    num = 0\n    stack = []\n    for c in s:\n        if c.isdigit():\n            num = num * 10 + int(c)\n        elif c == '+':\n            result += sign * num\n            num = 0\n            sign = 1\n        elif c == '-':\n            result += sign * num\n            num = 0\n            sign = -1\n        elif c == '(':\n            stack.append(result)\n            stack.append(sign)\n            result = 0\n            sign = 1\n        elif c == ')':\n            result += sign * num\n            num = 0\n            result *= stack.pop()\n            result += stack.pop()\n    return result + sign * num\n",
+        js: "function calculate(s) {\n  let result = 0, sign = 1, num = 0;\n  const stack = [];\n  for (const c of s) {\n    if (c >= '0' && c <= '9') {\n      num = num * 10 + (c.charCodeAt(0) - 48);\n    } else if (c === '+') {\n      result += sign * num; num = 0; sign = 1;\n    } else if (c === '-') {\n      result += sign * num; num = 0; sign = -1;\n    } else if (c === '(') {\n      stack.push(result); stack.push(sign); result = 0; sign = 1;\n    } else if (c === ')') {\n      result += sign * num; num = 0;\n      result *= stack.pop();\n      result += stack.pop();\n    }\n  }\n  return result + sign * num;\n}\n",
+      },
+      tests: [
+        { input: ['1 + 1'], expected: 2 },
+        { input: ['(1+(4+5+2)-3)+(6+8)'], expected: 23 },
+        { input: ['2-1 + 2'], expected: 3 },
+        { input: ['-2+ 1'], expected: -1 },
+        { input: ['1-(-2)'], expected: 3 },
+      ],
+      hints: [
+        'Track a running result, the current sign (+1/-1), and the number being read.',
+        'On "(", push the result and the sign so far, then start a fresh sub-result.',
+        'On ")", finish the sub-result, multiply by the pushed sign, and add the pushed result.',
+      ],
+      complexity: { time: 'O(n)', space: 'O(n)' },
+    },
   ],
 };
 

@@ -1,6 +1,7 @@
 # VISION — DSA Self-Study Platform ("lootcode")
 
-**Status: Full-autopilot build in progress (approved). Building all topics, final review at end.**
+**Status: ✅ COMPLETE — every acceptance criterion green. Awaiting final user review.**
+Final checks: `npm run verify` 63/63 · `npm run typecheck` clean · `npm run lint` clean · `npm run build` → 20 topic pages in `out/`.
 
 ### Build progress log
 - ✅ M0 Foundation + M1 Arrays & Hashing (3 problems)
@@ -95,9 +96,9 @@ These get expanded into the ledger as each milestone begins.
 ### Milestone 19 — Ship-ready
 | id | statement | verify | status |
 |----|-----------|--------|--------|
-| AC-90 | Progress (solved problems) persists in localStorage | `[review]` | todo |
-| AC-91 | Full `npm run build` + `npm run verify` + typecheck + lint all green | all four commands exit 0 | todo |
-| AC-92 | README with how to run, build, and add content | `[review]` | todo |
+| AC-90 | Progress (solved problems) persists in localStorage | `[review]` | **done** (lib/progress.ts) |
+| AC-91 | Full `npm run build` + `npm run verify` + typecheck + lint all green | all four commands exit 0 | **done** |
+| AC-92 | README with how to run, build, and add content | `[review]` | **done** |
 
 ---
 
