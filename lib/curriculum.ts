@@ -6,6 +6,7 @@ import binarySearch from './content/binary-search';
 import stack from './content/stack';
 import queuesDeques from './content/queues-deques';
 import linkedLists from './content/linked-lists';
+import trees from './content/trees';
 
 // The curriculum manifest: built topics in study order.
 // Add a topic by importing its module and appending it here.
@@ -17,6 +18,7 @@ export const TOPICS: Topic[] = [
   stack,
   queuesDeques,
   linkedLists,
+  trees,
 ].sort((a, b) => a.order - b.order);
 
 // Full planned curriculum (for the landing-page roadmap). Built topics are
@@ -26,6 +28,7 @@ export const ROADMAP: string[] = [
   'Two Pointers',
   'Sliding Window',
   'Binary Search',
+  'Sorting & Divide and Conquer',
   'Stack',
   'Queues & Deques',
   'Linked Lists',

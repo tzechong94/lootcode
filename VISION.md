@@ -7,7 +7,18 @@
 - ✅ Two Pointers (3) · Sliding Window (3) · Binary Search (3)
 - ✅ Stack (3) · Queues & Deques (3) · Linked Lists (3) — verify 21/21 green
 - ⏳ Next: Trees · Tries · Heap/PQ · Backtracking · Graphs · Advanced Graphs · 1-D DP · 2-D DP ·
-  Greedy · Intervals · Math & Bit · Union-Find (11 topics left)
+  Greedy · Intervals · Math & Bit · Union-Find · **Sorting & Divide and Conquer (new)**
+- 🔁 Back-fill into built topics: Stack → Basic Calculator; Linked Lists → Doubly Linked List.
+
+### CSPrimer curriculum integration (per user request, csprimer.com/courses/algorithms)
+Fold these problems into the matching topics as they're built:
+- Trees: **Process tree** (level-order/BFS)
+- Graphs/Advanced Graphs/Backtracking: **Word ladder, Jug pouring, Maze solver, Knight's tour**
+- 1-D DP: **House robber, Perfect squares, Staircase ascent (climbing stairs)**
+- 2-D DP: **Minimal grid path (min path sum), Edit distance**
+- Math & Bit / Greedy: **Convert to Roman, Fizzbuzz sum**
+- Sorting & Divide and Conquer (new topic): **Merge sort, Quicksort, Fast exponentiation**
+- Binary Search ✅ correct-binary-search · Stack ✅ parenthesis-match · Arrays ✅ finding-duplicates
 - To resume: check `lib/curriculum.ts` for built topics; each topic = tutorial + 2–3 problems
   with py+js references; run `npm run verify` (must stay green) then commit.
 
