@@ -12,6 +12,9 @@ import heapPriorityQueue from './content/heap-priority-queue';
 import backtracking from './content/backtracking';
 import graphs from './content/graphs';
 import dp1d from './content/dp-1d';
+import dp2d from './content/dp-2d';
+import greedy from './content/greedy';
+import intervals from './content/intervals';
 
 // The curriculum manifest: built topics in study order.
 // Add a topic by importing its module and appending it here.
@@ -29,6 +32,9 @@ export const TOPICS: Topic[] = [
   backtracking,
   graphs,
   dp1d,
+  dp2d,
+  greedy,
+  intervals,
 ].sort((a, b) => a.order - b.order);
 
 // Full planned curriculum (for the landing-page roadmap). Built topics are
