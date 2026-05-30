@@ -8,9 +8,11 @@
 - ✅ Stack (3) · Queues & Deques (3) · Linked Lists (3)
 - ✅ Trees (3) · Tries (2) · Heap/PQ (3) · Backtracking (3)
 - ✅ Graphs (3) · 1-D DP (4)
-- ✅ 2-D DP (4) · Greedy (3) · Intervals (3) — verify 49/49 green
-- ⏳ Next: Advanced Graphs · Math & Bit · Union-Find · **Sorting & Divide and Conquer (new)**
-  (4 topics left) + back-fills (Basic Calculator, Doubly Linked List)
+- ✅ 2-D DP (4) · Greedy (3) · Intervals (3)
+- ✅ Advanced Graphs (3) · Union-Find (3) · Math & Bit (3) · Sorting & D&C (3) — verify 61/61 green
+- ✅ ALL 20 roadmap topics built.
+- ⏳ Next: back-fills (Stack → Basic Calculator, Linked Lists → Doubly Linked List), then
+  final ship-readiness checks (AC-90/91/92: localStorage, build+verify+typecheck+lint, README).
 - 🔁 Back-fill into built topics: Stack → Basic Calculator; Linked Lists → Doubly Linked List.
 
 ### CSPrimer curriculum integration (per user request, csprimer.com/courses/algorithms)
