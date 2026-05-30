@@ -120,7 +120,25 @@ check it. With a decent hash function buckets stay tiny, so insert, lookup, and 
   },
   {
     kind: 'md',
-    md: `In code this is a \`dict\`/\`set\` in Python and a \`Map\`/\`Set\`/object in JS. You don't implement the
+    md: `### Collisions — and how real hash tables stay fast
+
+Two different keys hashing to the same bucket is a **collision** (you saw "owl" land on "cat" above).
+With enough keys collisions are inevitable — there are far more possible keys than buckets — so a hash
+table needs a strategy:
+
+- **Separate chaining** (what the animation showed): each bucket holds a small list; on collision you
+  append and, on lookup, scan just that short list.
+- **Open addressing** (linear/quadratic probing): keep one entry per slot; on collision, probe the
+  next slot(s) until you find a free one. Cache-friendly, no extra lists.
+- **A good hash function** spreads keys uniformly so no bucket gets crowded — the single biggest
+  factor in keeping operations O(1).
+- **Load factor & resizing**: once \`entries / buckets\` passes ~0.75, the table **doubles its buckets
+  and rehashes everything**. That keeps chains short, so insert/lookup stay **O(1) amortized**.
+
+This is why hashing is O(1) *on average* but O(n) *worst case* (all keys colliding into one bucket) —
+a distinction worth stating in interviews.
+
+In code this is a \`dict\`/\`set\` in Python and a \`Map\`/\`Set\`/object in JS. You don't implement the
 buckets — you just get O(1) membership and lookup, and trade some memory for it.
 
 ### The core move: *remember as you go*

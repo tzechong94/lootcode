@@ -16,7 +16,12 @@ Static Next.js DSA platform: 20 topics, 63 problems, dual-language (Python/JS) i
 - ⏳ Remaining 18 topics: sliding-window, binary-search, sorting-divide-conquer, stack, queues-deques,
   linked-lists, trees, tries, heap-priority-queue, backtracking, graphs, advanced-graphs, dp-1d, dp-2d,
   greedy, intervals, math-bit, union-find. Build renderer if missing, then rewrite prose + add concept viz.
-- Renderers built: array, grid, hash. Still to build as topics need them: tree, list, stack/queue, bits, graph, interval.
+- Renderers built: array, grid, hash, tree, list, stack/queue, bits, graph, interval (full library complete).
+
+### User-requested content additions (fold in as topics are built)
+- ✅ Arrays & Hashing: deeper **collision** handling (chaining vs open addressing, good hash fn, load factor & resizing).
+- ⏳ Linked Lists: explicit **array vs linked list** comparison — contiguous memory + O(1) index vs scattered
+  nodes + pointers + O(1) splice. Include a memory-layout concept visualizer.
 
 ### Vision
 Today's tutorials read like a crash course for solving the problems. Rebuild them to **teach from
