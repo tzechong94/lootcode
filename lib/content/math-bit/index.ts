@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 const tutorial = `
 ## Math & Bit Manipulation — first principles
@@ -47,12 +47,58 @@ solution to "find the single number" — no hash set needed.
 - Watch language differences — JS bitwise ops are 32-bit; Python integers are arbitrary precision.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Math & Bit Manipulation — from first principles
+
+Numbers are stored in **binary**, and operating on those bits directly is often faster and cleaner
+than arithmetic. The operators: \`&\` (AND — mask/check), \`|\` (OR — set), \`^\` (XOR — toggle/compare),
+\`~\` (NOT — flip), and \`<<\` \`>>\` (shift — multiply/divide by 2). A few tricks recur constantly.
+
+**XOR cancellation** is the headline: \`x ^ x = 0\` and \`x ^ 0 = x\`. So XORing a list where every value
+appears twice **cancels all the pairs**, leaving only the unique one — an O(n) time, O(1) space "find
+the single number" with no hash set.
+
+**\`n & (n - 1)\` clears the lowest set bit.** Repeating it until \`n\` is 0 counts the set bits in exactly
+(number of 1s) steps — Brian Kernighan's trick. Watch the lowest 1-bit vanish each step:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'bits',
+      title: "Counting set bits: n & (n-1) clears the lowest 1 each step",
+      frames: [
+        { caption: 'n = 11 = 1011₂. Goal: count the 1 bits. Trick: n & (n-1) removes the lowest set bit.', bits: [1, 0, 1, 1], label: 'n = 11', highlight: [3] },
+        { caption: '11 & 10 = 1010₂. The lowest 1 (the ones place) is gone. count = 1.', bits: [1, 0, 1, 0], label: 'n = 10', highlight: [1] },
+        { caption: '10 & 9 = 1000₂. Lowest 1 cleared again. count = 2.', bits: [1, 0, 0, 0], label: 'n = 8', highlight: [0] },
+        { caption: '8 & 7 = 0000₂. No bits left → stop. count = 3. We looped only once per set bit.', bits: [0, 0, 0, 0], label: 'n = 0' },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `A few more useful identities: \`x & -x\` isolates the lowest set bit; shifts multiply/divide by powers
+of two; \`gcd(a,b) = gcd(b, a%b)\`; and modular arithmetic (\`(a*b) % m\`) keeps huge products in range.
+And subresults reuse: \`bits[i] = bits[i >> 1] + (i & 1)\` counts set bits for every number 0..n in O(n).
+
+### Key points to remember
+
+- XOR cancels pairs (\`x ^ x = 0\`) — the trick behind "single number" and "missing number".
+- \`n & (n - 1)\` removes the lowest set bit; loop it to count set bits.
+- \`x & -x\` isolates the lowest set bit; shifts are fast ×/÷ by 2.
+- Reuse subresults: \`bits[i] = bits[i >> 1] + (i & 1)\`.
+- Mind language differences — JS bitwise ops are 32-bit; Python ints are arbitrary precision.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'math-bit',
   title: 'Math & Bit Manipulation',
   order: 18,
   blurb: 'Operate on bits directly: XOR cancellation, set-bit counting, and number-theory staples.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'single-number',

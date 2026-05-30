@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 const tutorial = `
 ## Intervals — first principles
@@ -46,12 +46,58 @@ based on whether you're *combining* overlaps (start) or *selecting* disjoint one
 - After sorting, a single linear pass solves most interval problems — O(n log n) overall.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Intervals — from first principles
+
+Interval problems hand you ranges \`[start, end]\` and ask about overlaps, merges, or how many fit
+without conflict. Almost all of them yield to the same realization: **once you sort the intervals, a
+single left-to-right sweep solves it** — the right sort key turns a tangle of ranges into a clean
+linear pass. (The overlap test itself is simple: \`[a,b]\` and \`[c,d]\` overlap iff \`a ≤ d\` and \`c ≤ b\`.)
+
+The canonical move for merging: **sort by start**, keep a "current" interval, and as you walk, either
+extend it (if the next overlaps) or emit it and start fresh (if there's a gap):`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'interval',
+      title: 'Merge overlapping intervals: sort by start, then sweep',
+      span: 11,
+      frames: [
+        { caption: 'Sort intervals by start time so overlaps become adjacent.', bars: [{ start: 1, end: 3 }, { start: 2, end: 6 }, { start: 8, end: 10 }] },
+        { caption: 'Take [1,3] as the current merged interval.', bars: [{ start: 1, end: 3, state: 'active' }, { start: 2, end: 6 }, { start: 8, end: 10 }] },
+        { caption: '[2,6] starts at 2 ≤ current end 3 → they overlap. Extend the current end to 6.', bars: [{ start: 1, end: 6, state: 'active', label: '[1,6]' }, { start: 2, end: 6, state: 'dim' }, { start: 8, end: 10 }] },
+        { caption: '[8,10] starts at 8 > 6 → a gap. Emit [1,6] and start a new current interval.', bars: [{ start: 1, end: 6, state: 'done', label: '[1,6]' }, { start: 8, end: 10, state: 'active' }] },
+        { caption: 'Result: [1,6] and [8,10]. One sort + one sweep → O(n log n).', bars: [{ start: 1, end: 6, state: 'done', label: '[1,6]' }, { start: 8, end: 10, state: 'done' }] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `The *other* canonical strategy flips the sort key: for "maximum non-overlapping intervals" /
+"minimum removals," **sort by end time** and greedily keep the interval that finishes earliest — it
+leaves the most room for the rest (classic activity selection). Picking the wrong key is the most
+common interval-problem mistake.
+
+### Key points to remember
+
+- Sort first — by **start** to merge/insert, by **end** to select the most non-overlapping.
+- Overlap test: \`a ≤ d and c ≤ b\`.
+- Merge sweep: extend the current interval while the next overlaps, else emit and restart.
+- "Max non-overlapping / min removals" = earliest-finish-first greedy.
+- After sorting, a single linear pass solves most interval problems → O(n log n) overall.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'intervals',
   title: 'Intervals',
   order: 17,
   blurb: 'Sort by the right key, then sweep: merge overlaps or pack the most non-overlapping ranges.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'merge-intervals',

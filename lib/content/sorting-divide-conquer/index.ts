@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 const tutorial = `
 ## Sorting & Divide and Conquer — first principles
@@ -50,12 +50,62 @@ power(x, n):  result = 1
 - Recognize \`T(n) = aT(n/b) + f(n)\`; that recurrence is what makes these algorithms efficient.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Sorting & Divide and Conquer — from first principles
+
+**Divide and conquer** solves a problem by splitting it into smaller *independent* subproblems,
+solving each recursively, and **combining** the results. Three steps: *divide, conquer, combine.* The
+efficiency comes from the recurrence — splitting in half and doing linear combine work gives
+\`T(n) = 2T(n/2) + O(n)\` = **O(n log n)**.
+
+**Merge sort** is the cleanest example, and the *combine* step is where the work lives: split the
+array in half, sort each half recursively, then **merge** two sorted halves in linear time. Watch it
+divide down to single elements, then merge back up:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'tree',
+      title: 'Merge sort: divide to singletons, then merge upward',
+      nodes: ['5,2,8,1', '5,2', '8,1', '5', '2', '8', '1'],
+      frames: [
+        { caption: 'Divide: split the array into two halves.', nodes: ['5,2,8,1', '5,2', '8,1', '5', '2', '8', '1'], active: [0] },
+        { caption: 'Split each half again…', nodes: ['5,2,8,1', '5,2', '8,1', '5', '2', '8', '1'], visited: [0], active: [1, 2] },
+        { caption: 'Down to single elements — each is trivially sorted. Nothing left to divide.', nodes: ['5,2,8,1', '5,2', '8,1', '5', '2', '8', '1'], visited: [0, 1, 2], active: [3, 4, 5, 6] },
+        { caption: 'Merge pairs: [5],[2] → [2,5]; [8],[1] → [1,8]. Merging two sorted lists is linear.', nodes: ['5,2,8,1', '2,5', '1,8', '5', '2', '8', '1'], visited: [3, 4, 5, 6], active: [1, 2] },
+        { caption: 'Merge the two sorted halves → [1,2,5,8]. The combine step is the real work; total is O(n log n).', nodes: ['1,2,5,8', '2,5', '1,8', '5', '2', '8', '1'], visited: [1, 2, 3, 4, 5, 6], active: [0] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `Because the merge step sees both sorted halves together, it can **count things** during the combine —
+counting **inversions** (out-of-order pairs) is the classic example: when an element from the right
+half is placed ahead of remaining left-half elements, each of those forms an inversion. Same O(n log n)
+as the sort.
+
+Divide and conquer isn't only for arrays. **Fast exponentiation** computes \`xⁿ\` as \`(xⁿ/²)²\` (times an
+extra \`x\` when n is odd), halving the exponent each step for **O(log n)** multiplications.
+
+### Key points to remember
+
+- Divide & conquer = split → recurse → **combine**; the combine step is usually where the cleverness lives.
+- Merge sort is O(n log n) and stable; its linear merge is a reusable building block.
+- Counting inversions piggybacks on the merge step — O(n log n) instead of O(n²).
+- Fast (binary) exponentiation halves the exponent for O(log n); keep a running modulus to avoid overflow.
+- Recognize \`T(n) = a·T(n/b) + f(n)\` — that recurrence is what makes these efficient.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'sorting-divide-conquer',
   title: 'Sorting & Divide and Conquer',
   order: 4.5,
   blurb: 'Divide, conquer, combine: merge sort, inversion counting, and fast exponentiation.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'sort-an-array',

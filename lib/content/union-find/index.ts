@@ -1,4 +1,13 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
+
+const UF_NODES = [
+  { id: 0, x: 0.15, y: 0.25 },
+  { id: 1, x: 0.15, y: 0.7 },
+  { id: 2, x: 0.45, y: 0.25 },
+  { id: 3, x: 0.45, y: 0.7 },
+  { id: 4, x: 0.75, y: 0.45 },
+  { id: 5, x: 0.95, y: 0.45 },
+];
 
 const PREAMBLE_PY = `class DSU:
     def __init__(self, n):
@@ -88,12 +97,63 @@ time (inverse-Ackermann, effectively ≤ 4):
 - It handles *incremental* connectivity; for one-shot reachability, plain DFS/BFS is fine too.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Union-Find (Disjoint Set Union) — from first principles
+
+Union-Find answers one question blazingly fast: **"are these two elements in the same group?"** — and
+lets you **merge** two groups. That's exactly what you need for **dynamic connectivity**: as edges
+arrive one at a time, track what's connected, count components, or catch the moment a cycle forms.
+
+The structure is a **forest**: each element points to a **parent**, and following parents leads to a
+group's **root** (its representative). Two elements share a group iff they share a root. \`union(a,b)\`
+links one root under the other; \`find(x)\` walks up to the root. Watch sets merge as edges arrive:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'graph',
+      title: 'Union-Find: merging sets, then path compression',
+      nodes: UF_NODES,
+      edges: [],
+      frames: [
+        { caption: 'Start: 6 elements, each its own set — each is its own root (no parent edges).', active: [0, 1, 2, 3, 4, 5] },
+        { caption: 'union(0,1): point one root at the other. {0,1} is now one set with root 0.', edges: [{ from: 1, to: 0, directed: true, state: 'tree' }], active: [0] },
+        { caption: 'union(2,3): {2,3} merges, root 2.', edges: [{ from: 1, to: 0, directed: true, state: 'tree' }, { from: 3, to: 2, directed: true, state: 'tree' }], active: [0, 2] },
+        { caption: 'union(1,3): find(1)=0, find(3)=2 — different roots, so link root 2 under root 0. Now {0,1,2,3}.', edges: [{ from: 1, to: 0, directed: true, state: 'tree' }, { from: 3, to: 2, directed: true, state: 'tree' }, { from: 2, to: 0, directed: true, state: 'active' }], active: [0] },
+        { caption: 'find(3) walks 3 → 2 → 0. Path compression then points 3 straight at the root, so future lookups are ~O(1).', edges: [{ from: 1, to: 0, directed: true, state: 'tree' }, { from: 2, to: 0, directed: true, state: 'tree' }, { from: 3, to: 0, directed: true, state: 'active' }], active: [0, 3] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `Two cheap optimizations make it near-constant time (inverse-Ackermann, effectively ≤ 4): **path
+compression** (during \`find\`, re-point nodes straight at the root, as the last frame showed) and
+**union by rank/size** (attach the smaller tree under the larger). A ready-made \`DSU\` with both is
+provided in the problems.
+
+It's the tool for **counting components** as edges arrive (start with n sets; each successful union
+drops the count by one), **cycle detection** (a union whose endpoints already share a root closes a
+cycle), and **Kruskal's MST**.
+
+### Key points to remember
+
+- Union-Find = near-O(1) "same group?" + "merge groups" for **dynamic** connectivity.
+- Path compression + union by rank are what make it fast — use both.
+- Components = n − (number of *successful* unions).
+- A union that finds both endpoints already joined means that edge creates a **cycle**.
+- Great for *incremental* connectivity; for one-shot reachability, plain DFS/BFS is fine too.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'union-find',
   title: 'Union-Find',
   order: 19,
   blurb: 'Disjoint sets for dynamic connectivity: count components, detect cycles, build MSTs.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'count-components',

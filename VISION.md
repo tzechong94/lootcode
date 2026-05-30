@@ -69,6 +69,12 @@ dp-1d, dp-2d, greedy, intervals, math-bit, union-find. (arrays-hashing + two-poi
 |----|-----------|--------|--------|
 | T-99 | Full `npm run build` + `npm run verify` + typecheck + lint green; README mentions interactive tutorials | all commands exit 0 | todo |
 
+### Process note (avoid breaking the live dev server)
+`next dev` and `next build` share `.next`; running `build` while `dev` is up wipes the dev server's
+chunks → assets 404 → unstyled page. **During loop iterations verify with `npm run typecheck` +
+`npm run lint` only** (they don't touch `.next`). Run the full `npm run build` ONLY at the final ship
+check, with the dev server stopped.
+
 ### Guardrails
 - Problems, tests, and the `verify` invariant (63/63) must stay green — this phase touches tutorials/UI only.
 - No pushing/deploying without explicit OK. Commit per topic.
