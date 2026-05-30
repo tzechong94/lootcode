@@ -6,9 +6,10 @@
 - ✅ M0 Foundation + M1 Arrays & Hashing (3 problems)
 - ✅ Two Pointers (3) · Sliding Window (3) · Binary Search (3)
 - ✅ Stack (3) · Queues & Deques (3) · Linked Lists (3)
-- ✅ Trees (3) · Tries (2) · Heap/PQ (3) · Backtracking (3) — verify 32/32 green
-- ⏳ Next: Graphs · Advanced Graphs · 1-D DP · 2-D DP · Greedy · Intervals · Math & Bit ·
-  Union-Find · **Sorting & Divide and Conquer (new)** (9 topics left)
+- ✅ Trees (3) · Tries (2) · Heap/PQ (3) · Backtracking (3)
+- ✅ Graphs (3) · 1-D DP (4) — verify 39/39 green
+- ⏳ Next: Advanced Graphs · 2-D DP · Greedy · Intervals · Math & Bit · Union-Find ·
+  **Sorting & Divide and Conquer (new)** (7 topics left) + back-fills (Basic Calculator, Doubly Linked List)
 - 🔁 Back-fill into built topics: Stack → Basic Calculator; Linked Lists → Doubly Linked List.
 
 ### CSPrimer curriculum integration (per user request, csprimer.com/courses/algorithms)
