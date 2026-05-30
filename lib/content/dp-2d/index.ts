@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 const tutorial = `
 ## 2-D Dynamic Programming — first principles
@@ -46,12 +46,60 @@ to **one or two rows** — O(n) space instead of O(m·n).
 - Only the previous row is needed ⇒ collapse to O(n) space once the recurrence is correct.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## 2-D Dynamic Programming — from first principles
+
+When a subproblem needs **two indices** to describe it, the dp table becomes a grid: \`dp[i][j]\`. This
+covers the two big families — **grid paths** (\`dp[i][j]\` depends on the cell above and to the left) and
+**two-sequence** problems (\`dp[i][j]\` = the answer for the first \`i\` of one string and first \`j\` of
+another: longest common subsequence, edit distance).
+
+The recipe is identical to 1-D, just with a 2-D state: define \`dp[i][j]\`, write the recurrence from
+neighbors (typically up, left, and the diagonal), set the first row/column as base cases, and fill so
+every dependency is ready. Here's "count paths to each cell, moving only right or down" — every cell
+is just the cell above **plus** the cell to its left:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'grid',
+      title: 'Grid-path DP: dp[i][j] = dp[i-1][j] + dp[i][j-1]',
+      frames: [
+        { caption: 'Edges first: the top row and left column each have exactly one path (straight line).', grid: [[{ value: 1, state: 'visited' }, { value: 1, state: 'visited' }, { value: 1, state: 'visited' }], [{ value: 1, state: 'visited' }, { value: '·', state: 'dim' }, { value: '·', state: 'dim' }], [{ value: 1, state: 'visited' }, { value: '·', state: 'dim' }, { value: '·', state: 'dim' }]] },
+        { caption: 'dp[1][1] = above (1) + left (1) = 2.', grid: [[{ value: 1, state: 'visited' }, { value: 1, state: 'frontier' }, { value: 1, state: 'visited' }], [{ value: 1, state: 'frontier' }, { value: 2, state: 'active' }, { value: '·', state: 'dim' }], [{ value: 1, state: 'visited' }, { value: '·', state: 'dim' }, { value: '·', state: 'dim' }]] },
+        { caption: 'dp[1][2] = above (1) + left (2) = 3.', grid: [[{ value: 1, state: 'visited' }, { value: 1, state: 'visited' }, { value: 1, state: 'frontier' }], [{ value: 1, state: 'visited' }, { value: 2, state: 'frontier' }, { value: 3, state: 'active' }], [{ value: 1, state: 'visited' }, { value: '·', state: 'dim' }, { value: '·', state: 'dim' }]] },
+        { caption: 'dp[2][1] = above (2) + left (1) = 3.', grid: [[{ value: 1, state: 'visited' }, { value: 1, state: 'visited' }, { value: 1, state: 'visited' }], [{ value: 1, state: 'visited' }, { value: 2, state: 'frontier' }, { value: 3, state: 'visited' }], [{ value: 1, state: 'frontier' }, { value: 3, state: 'active' }, { value: '·', state: 'dim' }]] },
+        { caption: 'dp[2][2] = above (3) + left (3) = 6. The corner is the answer: 6 paths.', grid: [[{ value: 1, state: 'visited' }, { value: 1, state: 'visited' }, { value: 1, state: 'visited' }], [{ value: 1, state: 'visited' }, { value: 2, state: 'visited' }, { value: 3, state: 'frontier' }], [{ value: 1, state: 'visited' }, { value: 3, state: 'frontier' }, { value: 6, state: 'active' }]] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `For **two-string** DP the move that matters is the **diagonal**: the question at \`dp[i][j]\` is always
+"do the current two characters match?" If yes, extend the diagonal \`dp[i-1][j-1]\`; if no, take the
+best of the off-diagonal neighbors (skip a char from one side). Longest common subsequence and edit
+distance are the *same* skeleton with different combine rules. And since each cell only needs the
+current and previous row, you can usually compress the table to **O(n) space**.
+
+### Key points to remember
+
+- Two indices in the subproblem ⇒ a 2-D table; the recurrence reads from up, left, and the diagonal.
+- Grid-path DP: only down/right moves ⇒ \`dp[i][j]\` from \`dp[i-1][j]\` + \`dp[i][j-1]\`.
+- Two-string DP: the **diagonal** handles "characters match"; off-diagonal handles insert/delete/skip.
+- Set the first row/column (empty-prefix) base cases carefully — most bugs live there.
+- Only the previous row is needed ⇒ collapse to O(n) space once the recurrence is right.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'dp-2d',
   title: '2-D Dynamic Programming',
   order: 15,
   blurb: 'Two-index states: grid-path DP and two-sequence DP (LCS, edit distance) via the diagonal.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'unique-paths',

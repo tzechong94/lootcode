@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 const tutorial = `
 ## 1-D Dynamic Programming — first principles
@@ -40,12 +40,60 @@ For \`House Robber\`, the choice at house \`i\` is *rob it* (\`dp[i-2] + nums[i]
 - If you can write the brute-force recursion, you can memoize it — that's already a correct DP.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## 1-D Dynamic Programming — from first principles
+
+Some problems break into smaller versions of *themselves* — and those smaller versions **repeat**.
+"Ways to climb n stairs" needs "ways to climb n−1" and "n−2", which each need smaller ones, and the
+same subproblems get re-solved exponentially by naive recursion. Dynamic programming's whole idea is:
+**solve each distinct subproblem once, store the answer, and reuse it.** That turns exponential into
+linear.
+
+The recipe: (1) define the **state** \`dp[i]\` = the answer to the subproblem at \`i\`; (2) write the
+**recurrence** — \`dp[i]\` from smaller indices (just "what was the last choice?"); (3) fill from the
+**base cases** upward. For climbing stairs, \`dp[i] = dp[i-1] + dp[i-2]\`. Watch the table fill, each
+cell built from ones already computed:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'array',
+      title: 'Filling a dp table: dp[i] = dp[i-1] + dp[i-2]',
+      frames: [
+        { caption: 'dp[i] = ways to reach step i. Base cases: dp[0] = dp[1] = 1.', cells: [{ value: 1, state: 'done' }, { value: 1, state: 'done' }, { value: '·', state: 'dim' }, { value: '·', state: 'dim' }, { value: '·', state: 'dim' }, { value: '·', state: 'dim' }, { value: '·', state: 'dim' }] },
+        { caption: 'dp[2] = dp[1] + dp[0] = 1 + 1 = 2. Both inputs are already known.', cells: [{ value: 1, state: 'compare' }, { value: 1, state: 'compare' }, { value: 2, state: 'active' }, { value: '·', state: 'dim' }, { value: '·', state: 'dim' }, { value: '·', state: 'dim' }, { value: '·', state: 'dim' }] },
+        { caption: 'dp[3] = dp[2] + dp[1] = 2 + 1 = 3.', cells: [{ value: 1, state: 'done' }, { value: 1, state: 'compare' }, { value: 2, state: 'compare' }, { value: 3, state: 'active' }, { value: '·', state: 'dim' }, { value: '·', state: 'dim' }, { value: '·', state: 'dim' }] },
+        { caption: 'dp[4] = 3 + 2 = 5.', cells: [{ value: 1, state: 'done' }, { value: 1, state: 'done' }, { value: 2, state: 'compare' }, { value: 3, state: 'compare' }, { value: 5, state: 'active' }, { value: '·', state: 'dim' }, { value: '·', state: 'dim' }] },
+        { caption: 'dp[5] = 5 + 3 = 8.', cells: [{ value: 1, state: 'done' }, { value: 1, state: 'done' }, { value: 2, state: 'done' }, { value: 3, state: 'compare' }, { value: 5, state: 'compare' }, { value: 8, state: 'active' }, { value: '·', state: 'dim' }] },
+        { caption: 'dp[6] = 8 + 5 = 13. Each subproblem solved once by reusing the previous two → O(n), O(1) space.', cells: [{ value: 1, state: 'done' }, { value: 1, state: 'done' }, { value: 2, state: 'done' }, { value: 3, state: 'done' }, { value: 5, state: 'compare' }, { value: 8, state: 'compare' }, { value: 13, state: 'match' }] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `**Top-down vs bottom-up:** you can write the natural recursion and *memoize* it (cache by state), or
+*tabulate* bottom-up by filling an array. They compute the same thing; tabulation often lets you drop
+the array to a couple of variables (many 1-D DPs only look back 1–2 steps → O(1) space).
+
+### Key points to remember
+
+- DP = recursion + memoization: each subproblem solved once, then reused.
+- Nail the **state definition** first; the recurrence falls out of "what was the last choice?".
+- Fibonacci-style relations need only the last one or two values → O(1) space.
+- "Min/max/number of ways to reach a target amount/length" is the classic 1-D DP smell.
+- If you can write the brute-force recursion, memoizing it is already a correct DP.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'dp-1d',
   title: '1-D Dynamic Programming',
   order: 14,
   blurb: 'Solve overlapping subproblems once: linear-state recurrences for counts, min/max, and reachability.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'climbing-stairs',

@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 const tutorial = `
 ## Greedy — first principles
@@ -44,12 +44,63 @@ worse.
 - Be ready to justify correctness — interviewers push on *why* the greedy choice is safe.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Greedy — from first principles
+
+A greedy algorithm builds an answer by always taking the choice that looks best **right now**, and
+never reconsidering. It's the opposite of DP's "try all options" — greedy commits immediately, which
+makes it fast and simple. The catch: it's only **correct when a local optimum is provably a global
+optimum** (the *greedy-choice property*). The entire skill is recognizing when that holds — and
+finding a counterexample when it doesn't.
+
+Here's a clean safe greedy — Jump Game's "track the furthest index reachable." At each position you
+just extend your reach as far as you can; you never plan exact jumps:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'array',
+      title: 'Greedy furthest-reach: can we reach the last index?',
+      frames: [
+        { caption: 'nums[i] = max jump from i. Track the furthest index reachable so far. Start at 0: reach = 0 + 2 = 2.', cells: [{ value: 2, state: 'active' }, { value: 3, state: 'window' }, { value: 1, state: 'window' }, { value: 1 }, { value: 4 }], pointers: [{ name: 'i', index: 0 }, { name: 'reach', index: 2 }] },
+        { caption: 'Index 1 is within reach. Jump 3 → extend reach to max(2, 1+3) = 4.', cells: [{ value: 2, state: 'done' }, { value: 3, state: 'active' }, { value: 1, state: 'window' }, { value: 1, state: 'window' }, { value: 4, state: 'window' }], pointers: [{ name: 'i', index: 1 }, { name: 'reach', index: 4 }] },
+        { caption: 'Index 2: 2+1 = 3 < 4, no improvement. reach stays 4.', cells: [{ value: 2, state: 'done' }, { value: 3, state: 'done' }, { value: 1, state: 'active' }, { value: 1, state: 'window' }, { value: 4, state: 'window' }], pointers: [{ name: 'i', index: 2 }, { name: 'reach', index: 4 }] },
+        { caption: 'Index 3: still within reach; reach stays 4.', cells: [{ value: 2, state: 'done' }, { value: 3, state: 'done' }, { value: 1, state: 'done' }, { value: 1, state: 'active' }, { value: 4, state: 'window' }], pointers: [{ name: 'i', index: 3 }, { name: 'reach', index: 4 }] },
+        { caption: 'Index 4 is the last and was reachable → true. Greedily extending reach never required planning exact jumps.', cells: [{ value: 2, state: 'done' }, { value: 3, state: 'done' }, { value: 1, state: 'done' }, { value: 1, state: 'done' }, { value: 4, state: 'match' }], pointers: [{ name: 'i', index: 4 }] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `The danger: greedy can be plain wrong. "Make change with the biggest coin first" fails for coin sets
+like {1, 3, 4} making 6 (greedy picks 4+1+1 = 3 coins; optimal is 3+3 = 2) — which is exactly why Coin
+Change needed DP. So the workflow is: guess a greedy rule, **try hard to break it on small/adversarial
+cases**, and only if it survives, justify it with an **exchange argument** (swapping in the greedy
+choice never makes an optimal solution worse).
+
+Reliable greedy shapes: **running best / Kadane's** (extend or restart), **furthest reach** (above),
+**largest-first** when denominations are built for it (Integer→Roman), and **sort-then-sweep**
+(interval scheduling by earliest finish).
+
+### Key points to remember
+
+- Greedy commits to a locally-optimal choice and never backtracks — fast, but only correct with the greedy-choice property.
+- **Always hunt for a counterexample first**; if you find one, it's a DP problem.
+- "Sort by the right key, then sweep" is the most common greedy shape.
+- Kadane's (running best) and furthest-reach are canonical safe greedies.
+- Be ready to justify *why* the local choice is globally safe — interviewers push on this.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'greedy',
   title: 'Greedy',
   order: 16,
   blurb: 'Commit to the locally-optimal choice — when a local optimum is provably global.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'maximum-subarray',
