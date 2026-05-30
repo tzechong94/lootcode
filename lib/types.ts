@@ -61,5 +61,168 @@ export interface Topic {
   blurb: string;
   /** Markdown tutorial: first-principles explanation + key points. */
   tutorial: string;
+  /**
+   * Optional structured tutorial: an ordered list of prose + interactive concept
+   * visualizers. When present, rendered instead of `tutorial`. Lets topics migrate
+   * to the interactive format one at a time.
+   */
+  blocks?: TutorialBlock[];
   problems: Problem[];
+}
+
+// ===== Interactive tutorial blocks =====
+// A tutorial is prose interleaved with step-through "concept visualizers" that teach
+// a topic's core mechanic generically (not a specific problem). Each visualizer is a
+// list of frames the learner advances through; each frame carries a caption.
+
+export interface MdBlock {
+  kind: 'md';
+  md: string;
+}
+export interface VizBlock {
+  kind: 'viz';
+  spec: VizSpec;
+}
+export type TutorialBlock = MdBlock | VizBlock;
+
+export type VizSpec =
+  | ArrayViz
+  | GridViz
+  | TreeViz
+  | ListViz
+  | StackViz
+  | HashViz
+  | BitsViz
+  | GraphViz
+  | IntervalViz;
+
+export type CellState = 'active' | 'compare' | 'match' | 'done' | 'window' | 'dim' | 'eliminated';
+export interface Pointer {
+  name: string;
+  index: number;
+}
+
+/** Row of cells with named pointers — arrays, two pointers, sliding window, binary search, DP table, bits-as-cells. */
+export interface ArrayFrame {
+  caption: string;
+  cells: { value: string | number; state?: CellState }[];
+  pointers?: Pointer[];
+}
+export interface ArrayViz {
+  type: 'array';
+  title?: string;
+  frames: ArrayFrame[];
+}
+
+export type GridState = 'active' | 'visited' | 'frontier' | 'wall' | 'start' | 'end' | 'path' | 'dim';
+export interface GridFrame {
+  caption: string;
+  grid: { value?: string | number; state?: GridState }[][];
+}
+export interface GridViz {
+  type: 'grid';
+  title?: string;
+  frames: GridFrame[];
+}
+
+/** Binary tree laid out from a level-order array; frames highlight node indices. */
+export interface TreeFrame {
+  caption: string;
+  active?: number[];
+  visited?: number[];
+  faded?: number[];
+}
+export interface TreeViz {
+  type: 'tree';
+  title?: string;
+  nodes: (number | string | null)[];
+  frames: TreeFrame[];
+}
+
+export interface ListFrame {
+  caption: string;
+  nodes: { value: string | number; state?: CellState }[];
+  pointers?: { name: string; index: number | null }[];
+}
+export interface ListViz {
+  type: 'list';
+  title?: string;
+  frames: ListFrame[];
+}
+
+/** Stack (LIFO, vertical) or queue (FIFO, horizontal). */
+export interface StackFrame {
+  caption: string;
+  items: (string | number)[];
+  highlight?: number[];
+}
+export interface StackViz {
+  type: 'stack' | 'queue';
+  title?: string;
+  frames: StackFrame[];
+}
+
+/** Hash buckets with an optional incoming key being routed to a bucket. */
+export interface HashFrame {
+  caption: string;
+  buckets: (string | number)[][];
+  incoming?: { key: string | number; bucket: number };
+  activeBucket?: number;
+}
+export interface HashViz {
+  type: 'hash';
+  title?: string;
+  frames: HashFrame[];
+}
+
+export interface BitsFrame {
+  caption: string;
+  bits: (0 | 1)[];
+  highlight?: number[];
+  label?: string;
+}
+export interface BitsViz {
+  type: 'bits';
+  title?: string;
+  frames: BitsFrame[];
+}
+
+export interface GraphNode {
+  id: string | number;
+  x: number; // 0..1
+  y: number; // 0..1
+}
+export interface GraphEdge {
+  from: string | number;
+  to: string | number;
+  directed?: boolean;
+  weight?: number;
+  state?: 'active' | 'tree' | 'dim';
+}
+export interface GraphFrame {
+  caption: string;
+  active?: (string | number)[];
+  visited?: (string | number)[];
+  frontier?: (string | number)[];
+  /** Override edges for this frame (e.g. union-find parent links changing). */
+  edges?: GraphEdge[];
+}
+export interface GraphViz {
+  type: 'graph';
+  title?: string;
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  frames: GraphFrame[];
+}
+
+/** Intervals on a timeline. */
+export interface IntervalFrame {
+  caption: string;
+  bars: { start: number; end: number; label?: string; state?: 'active' | 'done' | 'dim' | 'removed' }[];
+}
+export interface IntervalViz {
+  type: 'interval';
+  title?: string;
+  span: number;
+  frames: IntervalFrame[];
 }

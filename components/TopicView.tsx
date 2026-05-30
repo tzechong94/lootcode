@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { Topic } from '@/lib/types';
 import Markdown from './Markdown';
+import TutorialBlocks from './TutorialBlocks';
 import ProblemWorkspace from './ProblemWorkspace';
 
 export default function TopicView({ topic }: { topic: Topic }) {
@@ -30,7 +31,11 @@ export default function TopicView({ topic }: { topic: Topic }) {
       </div>
 
       {tab === 0 ? (
-        <Markdown>{topic.tutorial}</Markdown>
+        topic.blocks ? (
+          <TutorialBlocks blocks={topic.blocks} />
+        ) : (
+          <Markdown>{topic.tutorial}</Markdown>
+        )
       ) : (
         <ProblemWorkspace problem={topic.problems[tab - 1]} />
       )}
