@@ -1,4 +1,21 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
+
+const GRAPH_NODES = [
+  { id: 'A', x: 0.08, y: 0.5 },
+  { id: 'B', x: 0.35, y: 0.18 },
+  { id: 'C', x: 0.35, y: 0.82 },
+  { id: 'D', x: 0.62, y: 0.18 },
+  { id: 'E', x: 0.62, y: 0.82 },
+  { id: 'F', x: 0.9, y: 0.5 },
+];
+const GRAPH_EDGES = [
+  { from: 'A', to: 'B' },
+  { from: 'A', to: 'C' },
+  { from: 'B', to: 'D' },
+  { from: 'C', to: 'E' },
+  { from: 'D', to: 'F' },
+  { from: 'E', to: 'F' },
+];
 
 const tutorial = `
 ## Graphs — first principles
@@ -54,12 +71,86 @@ Graphs have cycles; without a visited set you'll revisit forever.
 - Topological sort orders a DAG and detects cycles (leftover nodes ⇒ cycle).
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Graphs — from first principles
+
+A graph is the most general structure: **nodes** connected by **edges**. Trees and linked lists are
+just graphs with restrictions, and even a **2-D grid** is a graph in disguise (each cell is a node
+wired to its neighbors). Edges may be directed or not, weighted or not, and — unlike a tree — graphs
+can have **cycles**. Almost any problem about reach, spread, connection, or dependency is a graph
+problem.
+
+You only need two ways to walk a graph, and the difference is everything.
+
+**Breadth-first (BFS)** explores in **rings of increasing distance** using a queue — so on an
+unweighted graph it finds **shortest paths**:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'graph',
+      title: 'BFS: expand outward in rings (shortest paths, unweighted)',
+      nodes: GRAPH_NODES,
+      edges: GRAPH_EDGES,
+      frames: [
+        { caption: 'BFS from A. A queue will visit nodes in order of distance from the start.', active: ['A'] },
+        { caption: 'Distance 1: every direct neighbor of A — B and C.', visited: ['A'], frontier: ['B', 'C'] },
+        { caption: 'Distance 2: neighbors of that ring — D and E.', visited: ['A', 'B', 'C'], frontier: ['D', 'E'] },
+        { caption: 'Distance 3: F. Each node is reached by its shortest path — that\'s why BFS solves unweighted shortest path.', visited: ['A', 'B', 'C', 'D', 'E'], frontier: ['F'] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `**Depth-first (DFS)** instead dives as deep as possible down one path before backtracking (recursion
+or an explicit stack) — the tool for flood fill, connected components, and cycle detection:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'graph',
+      title: 'DFS: dive deep, then backtrack',
+      nodes: GRAPH_NODES,
+      edges: GRAPH_EDGES,
+      frames: [
+        { caption: 'DFS from A: follow one path as far as it goes before considering alternatives.', active: ['A'] },
+        { caption: 'A → B.', visited: ['A'], active: ['B'] },
+        { caption: 'Deeper: B → D.', visited: ['A', 'B'], active: ['D'] },
+        { caption: 'Deeper: D → F.', visited: ['A', 'B', 'D'], active: ['F'] },
+        { caption: 'From F to its unvisited neighbor E.', visited: ['A', 'B', 'D', 'F'], active: ['E'] },
+        { caption: 'Backtrack until something is unvisited — C. DFS touches every node once → O(V+E).', visited: ['A', 'B', 'D', 'F', 'E'], active: ['C'] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `**The one rule that prevents infinite loops:** mark a node *visited* the moment you reach it — graphs
+have cycles, so without a visited set you'd loop forever.
+
+Two more staples: **multi-source BFS** seeds the queue with *every* start at once (rotting oranges,
+nearest exit) to get all shortest distances in one sweep; and **topological sort** (repeatedly remove
+a node with in-degree 0) orders a directed acyclic graph and **detects cycles** — if you can't remove
+everything, there's a cycle.
+
+### Key points to remember
+
+- Model it as a graph whenever you see connections, reachability, dependencies, or a grid.
+- DFS = stack/recursion (components, flood fill, cycle detection); BFS = queue (**shortest path, unweighted**).
+- Always track **visited** — graphs have cycles, unlike trees.
+- A grid is a graph; a cell's neighbors are its adjacent cells, bounds-checked.
+- Topological sort orders a DAG and exposes cycles (leftover nodes ⇒ cycle).`,
+  },
+];
+
 const topic: Topic = {
   slug: 'graphs',
   title: 'Graphs',
   order: 12,
   blurb: 'Nodes and edges (including grids): DFS for components, BFS for shortest paths, topological order.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'number-of-islands',

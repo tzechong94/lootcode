@@ -1,4 +1,11 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
+
+const DIJKSTRA_NODES = [
+  { id: 'A', x: 0.1, y: 0.5 },
+  { id: 'B', x: 0.45, y: 0.15 },
+  { id: 'C', x: 0.45, y: 0.85 },
+  { id: 'D', x: 0.85, y: 0.5 },
+];
 
 // Comparator min-heap for Dijkstra / Prim (orders by element[0]). Python uses heapq.
 const MINHEAP_JS = `class MinHeap {
@@ -85,12 +92,73 @@ variant (next topic).
 - Dijkstra needs non-negative weights — negative edges call for Bellman-Ford instead.
 `;
 
+const DIJKSTRA_EDGES = [
+  { from: 'A', to: 'B', weight: 1 },
+  { from: 'A', to: 'C', weight: 4 },
+  { from: 'B', to: 'C', weight: 2 },
+  { from: 'B', to: 'D', weight: 5 },
+  { from: 'C', to: 'D', weight: 1 },
+];
+
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Advanced Graphs — from first principles
+
+Plain BFS finds shortest paths only when every edge costs the **same**. The moment edges have
+different **weights**, a queue is no longer enough — the fewest-edges path may not be the cheapest.
+The upgrade is to always expand the **cheapest-known** node next, using a **min-heap** instead of a
+queue. That's **Dijkstra's algorithm** — "BFS with a priority queue."
+
+Keep a tentative distance to each node; repeatedly pop the closest unfinalized node and **relax** its
+edges (improve neighbors' tentative distances). Because weights are non-negative, the first time you
+pop a node its distance is already optimal. Watch it settle:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'graph',
+      title: "Dijkstra: always finalize the closest unfinalized node",
+      nodes: DIJKSTRA_NODES,
+      edges: DIJKSTRA_EDGES,
+      frames: [
+        { caption: 'Dijkstra from A. dist[A] = 0. A min-heap orders nodes by tentative distance.', active: ['A'] },
+        { caption: "Relax A's edges: dist[B] = 1, dist[C] = 4 (both tentative, sitting in the heap).", visited: ['A'], frontier: ['B', 'C'] },
+        { caption: 'Pop the closest unfinalized node — B (dist 1) — and finalize it. Its distance can no longer improve.', visited: ['A'], active: ['B'] },
+        { caption: 'Relax from B: dist[C] = min(4, 1+2) = 3 — improved! dist[D] = 1+5 = 6.', visited: ['A', 'B'], frontier: ['C', 'D'] },
+        { caption: 'Pop C (dist 3); finalize.', visited: ['A', 'B'], active: ['C'] },
+        { caption: 'Relax from C: dist[D] = min(6, 3+1) = 4 — improved via C.', visited: ['A', 'B', 'C'], frontier: ['D'] },
+        { caption: 'Pop D (dist 4). All finalized: A:0, B:1, C:3, D:4 — note the cheapest path to D goes A→B→C→D, not the single 5-edge.', visited: ['A', 'B', 'C'], active: ['D'] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `Two more advanced staples:
+
+- **Unweighted shortest path is still just BFS** — even on implicit graphs like word-ladder
+  transformations or board states, where each "state" is a node and an edge is one legal move.
+- **Minimum spanning tree (MST)** — the cheapest set of edges connecting *all* nodes. Grow it greedily
+  with **Prim's** (from the tree, repeatedly add the cheapest edge to a new node — a min-heap again) or
+  **Kruskal's** (sort edges, add each unless it forms a cycle — union-find, next topic).
+
+### Key points to remember
+
+- Unweighted shortest path ⇒ BFS; weighted, non-negative ⇒ **Dijkstra** (min-heap).
+- Dijkstra finalizes the closest node each step; skip already-finalized pops rather than decrease-key.
+- Model implicit graphs (transformations, board states) as nodes + edges, then BFS/Dijkstra them.
+- **MST** connects all nodes at minimum cost: Prim's grows from a node, Kruskal's sorts + union-find.
+- Dijkstra needs non-negative weights — negative edges need Bellman-Ford.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'advanced-graphs',
   title: 'Advanced Graphs',
   order: 13,
   blurb: 'Weighted graphs and global structure: BFS state-search, Dijkstra, and minimum spanning trees.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'word-ladder',
