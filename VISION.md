@@ -7,9 +7,10 @@
 - ✅ Two Pointers (3) · Sliding Window (3) · Binary Search (3)
 - ✅ Stack (3) · Queues & Deques (3) · Linked Lists (3)
 - ✅ Trees (3) · Tries (2) · Heap/PQ (3) · Backtracking (3)
-- ✅ Graphs (3) · 1-D DP (4) — verify 39/39 green
-- ⏳ Next: Advanced Graphs · 2-D DP · Greedy · Intervals · Math & Bit · Union-Find ·
-  **Sorting & Divide and Conquer (new)** (7 topics left) + back-fills (Basic Calculator, Doubly Linked List)
+- ✅ Graphs (3) · 1-D DP (4)
+- ✅ 2-D DP (4) · Greedy (3) · Intervals (3) — verify 49/49 green
+- ⏳ Next: Advanced Graphs · Math & Bit · Union-Find · **Sorting & Divide and Conquer (new)**
+  (4 topics left) + back-fills (Basic Calculator, Doubly Linked List)
 - 🔁 Back-fill into built topics: Stack → Basic Calculator; Linked Lists → Doubly Linked List.
 
 ### CSPrimer curriculum integration (per user request, csprimer.com/courses/algorithms)
