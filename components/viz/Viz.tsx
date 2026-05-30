@@ -3,6 +3,7 @@
 import type { VizSpec } from '@/lib/types';
 import ArrayViz from './ArrayViz';
 import GridViz from './GridViz';
+import HashViz from './HashViz';
 
 // Dispatch a VizSpec to its renderer. Renderers are added incrementally;
 // types without a renderer yet fall through to a small notice (no topic uses
@@ -13,6 +14,8 @@ export default function Viz({ spec }: { spec: VizSpec }) {
       return <ArrayViz spec={spec} />;
     case 'grid':
       return <GridViz spec={spec} />;
+    case 'hash':
+      return <HashViz spec={spec} />;
     default:
       return null;
   }

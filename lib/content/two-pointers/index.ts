@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 const tutorial = `
 ## Two Pointers — first principles
@@ -47,12 +47,66 @@ finding the middle (Floyd's algorithm, covered later).
 - It's O(1) extra space — call that out versus a hash-set approach that costs O(n) memory.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Two Pointers — from first principles
+
+Checking every pair of elements is O(n²): for each of n elements you scan the other n. The
+two-pointer technique asks a sharper question — *do I actually need to look at every pair?* When the
+data is **sorted**, the answer is no, because a single comparison tells you which whole set of
+possibilities to throw away.
+
+Picture two indices, one at each end of a sorted array, and a target sum. Look only at the pair they
+point to:
+
+- If their sum is **too big**, every pair that uses the right element is also too big (everything to
+  its left is smaller, but it's still paired with that large right value)... so the *only* useful
+  move is to pull the **right** pointer left.
+- If their sum is **too small**, symmetrically, move the **left** pointer right.
+
+Each comparison eliminates an entire row or column of the pair grid and advances a pointer that
+never goes back — so the whole array is processed in **one O(n) pass**. Watch the pointers converge:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'array',
+      title: 'Converging pointers on a sorted array (target sum = 10)',
+      frames: [
+        { caption: 'Sorted array. Pointers L and R start at the two ends. We want a pair summing to 10.', cells: [{ value: 1, state: 'active' }, { value: 3 }, { value: 4 }, { value: 6 }, { value: 8 }, { value: 11, state: 'active' }], pointers: [{ name: 'L', index: 0 }, { name: 'R', index: 5 }] },
+        { caption: '1 + 11 = 12 > 10. Too big — 11 is too large for any partner here, so move R left.', cells: [{ value: 1, state: 'compare' }, { value: 3 }, { value: 4 }, { value: 6 }, { value: 8 }, { value: 11, state: 'compare' }], pointers: [{ name: 'L', index: 0 }, { name: 'R', index: 5 }] },
+        { caption: '1 + 8 = 9 < 10. Too small — 1 is too little, so move L right to grow the sum.', cells: [{ value: 1, state: 'compare' }, { value: 3 }, { value: 4 }, { value: 6 }, { value: 8, state: 'compare' }, { value: 11, state: 'eliminated' }], pointers: [{ name: 'L', index: 0 }, { name: 'R', index: 4 }] },
+        { caption: '3 + 8 = 11 > 10. Too big — move R left.', cells: [{ value: 1, state: 'eliminated' }, { value: 3, state: 'compare' }, { value: 4 }, { value: 6 }, { value: 8, state: 'compare' }, { value: 11, state: 'eliminated' }], pointers: [{ name: 'L', index: 1 }, { name: 'R', index: 4 }] },
+        { caption: '3 + 6 = 9 < 10. Too small — move L right.', cells: [{ value: 1, state: 'eliminated' }, { value: 3, state: 'compare' }, { value: 4 }, { value: 6, state: 'compare' }, { value: 8, state: 'eliminated' }, { value: 11, state: 'eliminated' }], pointers: [{ name: 'L', index: 1 }, { name: 'R', index: 3 }] },
+        { caption: '4 + 6 = 10. Found it — in a single pass, O(n), never revisiting a pair we ruled out.', cells: [{ value: 1, state: 'eliminated' }, { value: 3, state: 'eliminated' }, { value: 4, state: 'match' }, { value: 6, state: 'match' }, { value: 8, state: 'eliminated' }, { value: 11, state: 'eliminated' }], pointers: [{ name: 'L', index: 2 }, { name: 'R', index: 3 }] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `That's the **converging** shape, the go-to for sorted arrays and palindromes. There's a second
+shape — **fast & slow** pointers moving the *same* direction at different speeds — used to rewrite an
+array in place (read pointer races ahead, write pointer lags) and, on linked lists, to find the
+middle or detect a cycle (covered in Linked Lists).
+
+### Key points to remember
+
+- Two pointers turn "check every pair" (O(n²)) into one linear pass (O(n)) — usually after **sorting**.
+- It works because each comparison is **monotonic**: it rules out a whole set of pairs and lets a pointer advance for good.
+- **Converging** pointers (ends → middle) need sorted data; **fast/slow** (same direction) handle in-place rewrites and traversal.
+- For k-sum, fix the outer element(s) and two-pointer the rest; **skip duplicates** to avoid repeats.
+- It's O(1) extra space — contrast that with the O(n) memory a hash-set approach would use.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'two-pointers',
   title: 'Two Pointers',
   order: 2,
   blurb: 'Coordinate two indices to turn nested-loop pair searches into a single O(n) pass.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'valid-palindrome',

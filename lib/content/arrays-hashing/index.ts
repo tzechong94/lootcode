@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 const tutorial = `
 ## Arrays & Hashing — first principles
@@ -63,12 +63,102 @@ reach for a **count map**: element → how many times it occurred. Comparing two
 - Hash tables cost extra space — the trade is O(n) memory for O(n) time. Mention this trade-off in interviews.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Arrays & Hashing — from first principles
+
+Start with what a computer can do *instantly*. An **array** is a contiguous block of memory, so the
+location of element \`i\` is just \`base + i × size\` — a single multiply-and-add. That's the whole
+reason \`a[i]\` is **O(1)**: the machine never searches, it computes an address and jumps there.
+
+But that O(1) superpower is **indexed by position, not by value**. The moment you ask "*is the value
+42 in here?*" the address trick is useless — you have to look at elements one by one. On an unsorted
+array that's **O(n)**, and doing it inside a loop is the O(n²) brute force that haunts beginner
+solutions. Watch what "search by value" actually costs:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'array',
+      title: 'Linear search — O(n) to find a value',
+      frames: [
+        { caption: 'We want to know if 7 is in this unsorted array. The index trick can\'t help — we must look.', cells: [{ value: 4 }, { value: 9 }, { value: 2 }, { value: 7 }, { value: 5 }], pointers: [{ name: 'i', index: 0 }] },
+        { caption: 'Check index 0: 4 ≠ 7. One comparison spent.', cells: [{ value: 4, state: 'compare' }, { value: 9 }, { value: 2 }, { value: 7 }, { value: 5 }], pointers: [{ name: 'i', index: 0 }] },
+        { caption: 'Index 1: 9 ≠ 7. Keep going.', cells: [{ value: 4, state: 'dim' }, { value: 9, state: 'compare' }, { value: 2 }, { value: 7 }, { value: 5 }], pointers: [{ name: 'i', index: 1 }] },
+        { caption: 'Index 2: 2 ≠ 7.', cells: [{ value: 4, state: 'dim' }, { value: 9, state: 'dim' }, { value: 2, state: 'compare' }, { value: 7 }, { value: 5 }], pointers: [{ name: 'i', index: 2 }] },
+        { caption: 'Index 3: 7 = 7. Found it — but in the worst case we\'d have scanned all n cells. That\'s O(n) per lookup.', cells: [{ value: 4, state: 'dim' }, { value: 9, state: 'dim' }, { value: 2, state: 'dim' }, { value: 7, state: 'match' }, { value: 5 }], pointers: [{ name: 'i', index: 3 }] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `### The hash table: O(1) access *by value*
+
+Here's the trick that fixes it. What if a value could compute *its own* slot, the way an index
+computes its address? A **hash function** does exactly that: it turns a key (a number, a string,
+anything) into a bucket number. To store a key you hash it and drop it in that bucket; to check for
+it you hash it again and look in **only that one bucket** — no scanning the rest.
+
+Two keys can hash to the same bucket (a **collision**); we just keep a small list in each bucket and
+check it. With a decent hash function buckets stay tiny, so insert, lookup, and delete are all
+**O(1) on average**. Step through it:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'hash',
+      title: 'A hash table: store and look up by value',
+      frames: [
+        { caption: 'An empty hash table with 4 buckets.', buckets: [[], [], [], []] },
+        { caption: 'Insert "cat": the hash function maps it to bucket 2. Drop it straight in — no searching.', buckets: [[], [], ['cat'], []], incoming: { key: 'cat', bucket: 2 }, activeBucket: 2 },
+        { caption: 'Insert "dog": hashes to bucket 0.', buckets: [['dog'], [], ['cat'], []], incoming: { key: 'dog', bucket: 0 }, activeBucket: 0 },
+        { caption: 'Insert "owl": also hashes to bucket 2 — a collision. We just chain it in the same bucket.', buckets: [['dog'], [], ['cat', 'owl'], []], incoming: { key: 'owl', bucket: 2 }, activeBucket: 2 },
+        { caption: 'Look up "dog": hash to bucket 0 and jump straight there. O(1) — the other buckets are never touched.', buckets: [['dog'], [], ['cat', 'owl'], []], incoming: { key: 'dog', bucket: 0 }, activeBucket: 0 },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `In code this is a \`dict\`/\`set\` in Python and a \`Map\`/\`Set\`/object in JS. You don't implement the
+buckets — you just get O(1) membership and lookup, and trade some memory for it.
+
+### The core move: *remember as you go*
+
+Almost every "arrays & hashing" problem is the same idea: instead of re-scanning the array to answer
+"have I seen something before?", **record what you've seen in a hash table as you pass each element
+once**. That collapses the O(n²) "compare every pair" into a single O(n) sweep:
+
+\`\`\`text
+seen = {}
+for each element x:
+    if (the thing we need) is already in seen:   # O(1)
+        we're done
+    record x in seen                              # O(1)
+\`\`\`
+
+When a problem mentions duplicates, pairs that sum to a target, counting occurrences, or grouping
+"things that are the same under some rule", reach for a **set** (membership) or a **map**
+(count / index / group). A canonical key — like the sorted letters of a word — groups items that are
+equal under that rule.
+
+### Key points to remember
+
+- Arrays give O(1) access **by index**; finding a value is O(n) — that O(n) inside a loop is the O(n²) trap.
+- A hash table gives O(1) average access **by value** — the fix for repeated lookups.
+- Use a **set** for "have I seen it?", a **map** for counts / indices / groups.
+- A canonical key collapses "equal under some rule" into one bucket.
+- The cost is memory: you trade O(n) space for O(n) time. Say that trade-off out loud in interviews.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'arrays-hashing',
   title: 'Arrays & Hashing',
   order: 1,
   blurb: 'Trade space for time: use hash sets and maps to collapse O(n²) scans into O(n).',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'two-sum',
