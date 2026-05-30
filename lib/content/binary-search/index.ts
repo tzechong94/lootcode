@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 const tutorial = `
 ## Binary Search — first principles
@@ -50,12 +50,61 @@ bananas, ship packages in D days, etc.). Recognizing the hidden monotonicity is 
 - "Find the smallest/largest x such that …" is the tell for binary-searching the answer.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Binary Search — from first principles
+
+Linear search throws away **one** candidate per comparison. Binary search throws away **half**. That's
+the entire idea — and it's the difference between O(n) and O(log n) (for a million elements, ~20 steps
+instead of a million).
+
+The precondition is **monotonicity**: the data must be arranged so that one comparison at the middle
+tells you which half *cannot* contain the answer. A sorted array is the obvious case — if the middle
+is too small, the target can only be to the right, so the entire left half (and the middle) is gone in
+a single step. Watch the search space collapse:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'array',
+      title: 'Each comparison discards half the array (searching for 9)',
+      frames: [
+        { caption: 'Sorted array, target 9. Look at the middle element, 7.', cells: [{ value: 1 }, { value: 3 }, { value: 5 }, { value: 7, state: 'compare' }, { value: 9 }, { value: 11 }, { value: 13 }], pointers: [{ name: 'lo', index: 0 }, { name: 'mid', index: 3 }, { name: 'hi', index: 6 }] },
+        { caption: '7 < 9, so 9 must be to the right. Discard the left half and the middle — gone in one step.', cells: [{ value: 1, state: 'eliminated' }, { value: 3, state: 'eliminated' }, { value: 5, state: 'eliminated' }, { value: 7, state: 'eliminated' }, { value: 9 }, { value: 11 }, { value: 13 }], pointers: [{ name: 'lo', index: 4 }, { name: 'hi', index: 6 }] },
+        { caption: 'New middle of what remains: 11.', cells: [{ value: 1, state: 'eliminated' }, { value: 3, state: 'eliminated' }, { value: 5, state: 'eliminated' }, { value: 7, state: 'eliminated' }, { value: 9 }, { value: 11, state: 'compare' }, { value: 13 }], pointers: [{ name: 'lo', index: 4 }, { name: 'mid', index: 5 }, { name: 'hi', index: 6 }] },
+        { caption: '11 > 9, so discard the right half.', cells: [{ value: 1, state: 'eliminated' }, { value: 3, state: 'eliminated' }, { value: 5, state: 'eliminated' }, { value: 7, state: 'eliminated' }, { value: 9 }, { value: 11, state: 'eliminated' }, { value: 13, state: 'eliminated' }], pointers: [{ name: 'lo', index: 4 }, { name: 'hi', index: 4 }] },
+        { caption: 'One candidate left, and it is 9. Found in ~log₂(7) ≈ 3 steps instead of 7.', cells: [{ value: 1, state: 'eliminated' }, { value: 3, state: 'eliminated' }, { value: 5, state: 'eliminated' }, { value: 7, state: 'eliminated' }, { value: 9, state: 'match' }, { value: 11, state: 'eliminated' }, { value: 13, state: 'eliminated' }], pointers: [{ name: 'mid', index: 4 }] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `### The real superpower: binary-search the *answer*
+
+Binary search isn't limited to finding a value in an array. Whenever you can write a **monotonic
+predicate** \`feasible(x)\` — "if x works, everything larger (or smaller) also works" — you can binary
+search the *answer space* itself: guess the middle value, check feasibility, discard half the range.
+This is how "minimum speed / capacity / time such that a condition holds" problems (Koko eating
+bananas, ship-packages-in-D-days) become O(log range). Spotting the hidden monotonicity is the skill.
+
+### Key points to remember
+
+- The precondition is **monotonicity**, not literally a sorted array — a yes/no predicate that flips once is enough.
+- Each step discards half the candidates → O(log n).
+- Always move *past* the middle (\`mid ± 1\`) on the discarded side, or the range never shrinks and you loop forever.
+- Pick one template and reuse it: \`lo <= hi\` returning -1 for exact match; \`lo < hi\` converging for a boundary.
+- "Smallest/largest x such that …" is the tell to binary-search the answer.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'binary-search',
   title: 'Binary Search',
   order: 4,
   blurb: 'Halve a monotonic search space each step — including searching over the answer itself.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'binary-search',

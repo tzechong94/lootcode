@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 const tutorial = `
 ## Sliding Window — first principles
@@ -55,12 +55,63 @@ chars / higher frequency). If reordering or non-contiguous picks are allowed, it
 - Contiguity is the prerequisite — without it, reach for sorting/hashing instead.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Sliding Window — from first principles
+
+Suppose you want the best **contiguous** stretch of an array — the longest substring with no repeats,
+the smallest subarray summing to at least K. The brute force tries every start/end pair and
+recomputes each stretch from scratch: O(n²) or worse. But notice the waste: when you slide from one
+window to the next, almost all the elements are the *same*. Why recompute them?
+
+A **sliding window** keeps two indices, \`left\` and \`right\`, bounding the current stretch, plus a
+small **running summary** of what's inside (a count, a sum, a set). As \`right\` moves to include a new
+element you update the summary in O(1); when the window breaks a rule, you advance \`left\` to drop
+elements — also O(1) each. Because both pointers only move *forward*, every element is added once and
+removed once: the whole scan is **O(n)**.
+
+Here's the variable-size window in action, finding the longest stretch with no repeated character —
+grow on the right, and shrink from the left the moment a duplicate appears:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'array',
+      title: 'A window that grows right and shrinks left to keep "no repeats"',
+      frames: [
+        { caption: 'right expands the window to include a; window = "a".', cells: [{ value: 'a', state: 'window' }, { value: 'b' }, { value: 'c' }, { value: 'a' }, { value: 'b' }, { value: 'b' }], pointers: [{ name: 'L', index: 0 }, { name: 'R', index: 0 }] },
+        { caption: 'Include b — still all distinct. window = "ab".', cells: [{ value: 'a', state: 'window' }, { value: 'b', state: 'window' }, { value: 'c' }, { value: 'a' }, { value: 'b' }, { value: 'b' }], pointers: [{ name: 'L', index: 0 }, { name: 'R', index: 1 }] },
+        { caption: 'Include c. window = "abc", length 3 — our best so far.', cells: [{ value: 'a', state: 'window' }, { value: 'b', state: 'window' }, { value: 'c', state: 'window' }, { value: 'a' }, { value: 'b' }, { value: 'b' }], pointers: [{ name: 'L', index: 0 }, { name: 'R', index: 2 }] },
+        { caption: 'right hits a — but a is already in the window. Shrink from the left until the duplicate is gone.', cells: [{ value: 'a', state: 'eliminated' }, { value: 'b', state: 'window' }, { value: 'c', state: 'window' }, { value: 'a', state: 'compare' }, { value: 'b' }, { value: 'b' }], pointers: [{ name: 'L', index: 1 }, { name: 'R', index: 3 }] },
+        { caption: 'Now window = "bca", valid again. Include the next b → duplicate, shrink left past the old b.', cells: [{ value: 'a', state: 'eliminated' }, { value: 'b', state: 'eliminated' }, { value: 'c', state: 'window' }, { value: 'a', state: 'window' }, { value: 'b', state: 'compare' }, { value: 'b' }], pointers: [{ name: 'L', index: 2 }, { name: 'R', index: 4 }] },
+        { caption: 'Last b repeats again → shrink to just "b". Each index entered and left once → O(n) total.', cells: [{ value: 'a', state: 'eliminated' }, { value: 'b', state: 'eliminated' }, { value: 'c', state: 'eliminated' }, { value: 'a', state: 'eliminated' }, { value: 'b', state: 'eliminated' }, { value: 'b', state: 'window' }], pointers: [{ name: 'L', index: 5 }, { name: 'R', index: 5 }] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `The same shape with a **fixed** size just slides a constant-width window one step at a time, adding
+the entering element and removing the leaving one. The art is choosing an O(1)-updatable summary —
+a sum, a frequency map, a count of distinct values — so you never re-scan the window's interior.
+
+### Key points to remember
+
+- The window is always a contiguous range \`[left, right]\`; both pointers only move forward → O(n).
+- Keep an **O(1)-updatable summary** of the window — never recompute over its contents.
+- "Longest/shortest contiguous … such that <condition>" with a monotonic condition ⇒ variable window.
+- Grow with \`right\`; shrink with \`left\` exactly while the condition is violated.
+- Contiguity is the prerequisite — if reordering or gaps are allowed, it isn't a window problem.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'sliding-window',
   title: 'Sliding Window',
   order: 3,
   blurb: 'Maintain a moving contiguous range with an O(1)-updatable summary to get O(n) subarray answers.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'best-time-to-buy-sell-stock',
