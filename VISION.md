@@ -5,9 +5,10 @@
 ### Build progress log
 - ✅ M0 Foundation + M1 Arrays & Hashing (3 problems)
 - ✅ Two Pointers (3) · Sliding Window (3) · Binary Search (3)
-- ✅ Stack (3) · Queues & Deques (3) · Linked Lists (3) — verify 21/21 green
-- ⏳ Next: Trees · Tries · Heap/PQ · Backtracking · Graphs · Advanced Graphs · 1-D DP · 2-D DP ·
-  Greedy · Intervals · Math & Bit · Union-Find · **Sorting & Divide and Conquer (new)**
+- ✅ Stack (3) · Queues & Deques (3) · Linked Lists (3)
+- ✅ Trees (3) · Tries (2) · Heap/PQ (3) · Backtracking (3) — verify 32/32 green
+- ⏳ Next: Graphs · Advanced Graphs · 1-D DP · 2-D DP · Greedy · Intervals · Math & Bit ·
+  Union-Find · **Sorting & Divide and Conquer (new)** (9 topics left)
 - 🔁 Back-fill into built topics: Stack → Basic Calculator; Linked Lists → Doubly Linked List.
 
 ### CSPrimer curriculum integration (per user request, csprimer.com/courses/algorithms)
