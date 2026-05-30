@@ -66,12 +66,16 @@ print(json.dumps(out))
   }
 }
 
+function withPreamble(preamble: string | undefined, code: string): string {
+  return preamble ? `${preamble}\n${code}` : code;
+}
+
 function checkLang(problem: Problem, lang: 'js' | 'py'): string[] {
   const failures: string[] = [];
   const results =
     lang === 'js'
-      ? runJs(problem.reference.js, problem.functionName.js, problem.tests)
-      : runPy(problem.reference.py, problem.functionName.py, problem.tests);
+      ? runJs(withPreamble(problem.preamble?.js, problem.reference.js), problem.functionName.js, problem.tests)
+      : runPy(withPreamble(problem.preamble?.py, problem.reference.py), problem.functionName.py, problem.tests);
 
   problem.tests.forEach((tc, i) => {
     const r = results[i];

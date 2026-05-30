@@ -59,9 +59,9 @@ verify is green for it.
 Each: **tutorial** (first-principles + key points) + **2–3 problems** with reference solutions in
 both languages + **`npm run verify` green** + checkpoint pause.
 
-Order: Two Pointers · Sliding Window · Binary Search · Stack · Linked Lists · Trees · Tries ·
-Heap/Priority Queue · Backtracking · Graphs · Advanced Graphs · 1-D DP · 2-D DP · Greedy ·
-Intervals · Math & Bit Manipulation · Union-Find.
+Order: Two Pointers · Sliding Window · Binary Search · Stack · Queues & Deques · Linked Lists ·
+Trees · Tries · Heap/Priority Queue · Backtracking · Graphs · Advanced Graphs · 1-D DP · 2-D DP ·
+Greedy · Intervals · Math & Bit Manipulation · Union-Find.
 
 Per-topic criteria are templated as: `AC-{topic}-T` (tutorial, `[review]`),
 `AC-{topic}-P` (problems + verify green), `AC-{topic}-R` (renders end-to-end, `[review]`).

@@ -145,6 +145,10 @@ __json.dumps(__out)
 
 // ---------- Unified entry point ----------
 
+function withPreamble(preamble: string | undefined, code: string): string {
+  return preamble ? `${preamble}\n${code}` : code;
+}
+
 export async function runProblem(
   problem: Problem,
   lang: Lang,
@@ -152,8 +156,8 @@ export async function runProblem(
 ): Promise<RunCaseResult[]> {
   const raw =
     lang === 'js'
-      ? await runJs(code, problem.functionName.js, problem.tests)
-      : await runPy(code, problem.functionName.py, problem.tests);
+      ? await runJs(withPreamble(problem.preamble?.js, code), problem.functionName.js, problem.tests)
+      : await runPy(withPreamble(problem.preamble?.py, code), problem.functionName.py, problem.tests);
 
   return problem.tests.map((tc, i) => {
     const r = raw[i];

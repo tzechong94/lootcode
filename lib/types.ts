@@ -36,6 +36,12 @@ export interface Problem {
   examples?: Example[];
   /** Function the harness invokes, per language (py: snake_case, js: camelCase). */
   functionName: Record<Lang, string>;
+  /**
+   * Optional helper code prepended before user/reference code in every execution
+   * path (e.g. a ListNode/TreeNode class + array<->structure builders). Lets the
+   * solution function take/return plain JSON while still working with real nodes.
+   */
+  preamble?: Partial<Record<Lang, string>>;
   /** Editor starting code, per language. */
   starter: Record<Lang, string>;
   /** Reference solution that MUST pass `tests`, per language. */
