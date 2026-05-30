@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 // Provided to JS solutions (JS has no built-in heap). Python uses heapq.
 const MINHEAP_JS = `class MinHeap {
@@ -80,12 +80,78 @@ Most libraries give a min-heap (Python's \`heapq\`; here a \`MinHeap\` is provid
 - Heaps shine for *streaming*/repeated-extreme queries; for a one-shot "k most frequent", bucketing by count can be O(n).
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Heap / Priority Queue — from first principles
+
+A **priority queue** always hands you the smallest (or largest) element next, regardless of insertion
+order. The trick to doing that fast is the **binary heap**: a *complete* binary tree obeying the
+**heap property** — every parent is ≤ both children (a min-heap). That single invariant puts the
+minimum at the root (O(1) to peek) and, because the tree is complete, it packs perfectly into an
+array (a node at index \`i\` has children at \`2i+1\` and \`2i+2\`) — no pointers needed.
+
+Insert and remove are O(log n) because you only fix **one root-to-leaf path**. On insert, drop the
+new value in the next slot and **sift up** while it's smaller than its parent:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'tree',
+      title: 'Insert into a min-heap: sift up',
+      nodes: [2, 5, 3, 8, 9, 4],
+      frames: [
+        { caption: 'A min-heap: every parent ≤ its children, so the minimum (2) sits at the root.', nodes: [2, 5, 3, 8, 9, 4] },
+        { caption: 'Insert 1: place it in the next open slot to keep the tree complete, then bubble it up.', nodes: [2, 5, 3, 8, 9, 4, 1], active: [6] },
+        { caption: '1 < its parent 3 → swap them upward.', nodes: [2, 5, 1, 8, 9, 4, 3], active: [2] },
+        { caption: '1 < its parent 2 → swap again. 1 is the new root. Only one path moved → O(log n).', nodes: [1, 5, 2, 8, 9, 4, 3], active: [0] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `Removing the min is the mirror image: take the root, move the **last** element up to the root to keep
+the tree complete, then **sift down**, swapping with the smaller child until the heap property holds:`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'tree',
+      title: 'Pop the min: sift down',
+      nodes: [1, 5, 2, 8, 9, 4, 3],
+      frames: [
+        { caption: 'Pop returns the root (1). Move the last element (3) up to the root to stay complete.', nodes: [1, 5, 2, 8, 9, 4, 3], active: [0] },
+        { caption: '3 is now at the root. Compare with children 5 and 2; swap with the smaller, 2.', nodes: [3, 5, 2, 8, 9, 4], active: [0] },
+        { caption: '3 vs its child 4: 3 < 4, so the heap property holds. Done — pop is O(log n).', nodes: [2, 5, 3, 8, 9, 4], active: [2] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `### When to reach for a heap
+
+Whenever you repeatedly need the **current extreme** of a changing set: **"top-k / kth largest"** (keep
+a size-k heap — for the kth *largest*, a **min-heap of size k** so the smallest of your k biggest is
+on top), **merging** sorted streams, **Dijkstra**, and greedies like "smash the two heaviest stones."
+Most libraries give a min-heap (Python's \`heapq\`); simulate a max-heap by negating values.
+
+### Key points to remember
+
+- A heap gives O(1) peek and O(log n) push/pop of the extreme — not fully sorted, just fast at one end.
+- "Kth largest" ⇒ a **min-heap of size k** (and "kth smallest" ⇒ a max-heap of size k).
+- Simulate a max-heap with a min-heap by negating values.
+- Don't sort (O(n log n)) when you only need the top k — a size-k heap is O(n log k).
+- It's complete-tree-as-array: children of \`i\` are \`2i+1\` and \`2i+2\`; no pointers.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'heap-priority-queue',
   title: 'Heap / Priority Queue',
   order: 10,
   blurb: 'Fast access to the current extreme: top-k, merging, and greedy "consume the max" patterns.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'kth-largest-element',

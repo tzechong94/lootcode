@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 const PREAMBLE_PY = `class TreeNode:
     def __init__(self, val=0, left=None, right=None):
@@ -123,12 +123,80 @@ queue one level's worth at a time by snapshotting its length before the inner lo
 - Most bugs are a missing base case or combining children incorrectly — write the base case first.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Trees — from first principles
+
+A tree is a set of nodes with exactly one path between any two — one root, no cycles, each node
+having a single parent. A **binary tree** caps each node at a \`left\` and \`right\` child. The defining
+property is **self-similarity**: a tree is *a root plus a left subtree and a right subtree, each of
+which is itself a tree*. That recursive shape is why most tree algorithms are three lines — handle the
+empty case, recurse on the children, combine.
+
+There are two ways to walk a tree, and the choice drives everything.
+
+**Depth-first (DFS)** dives all the way down one branch before backing up — natural as recursion (or
+an explicit stack). Watch a preorder DFS (visit node, then left subtree, then right):`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'tree',
+      title: 'Depth-first search (preorder): go deep before wide',
+      nodes: [1, 2, 3, 4, 5, 6, 7],
+      frames: [
+        { caption: 'Preorder DFS: visit a node, then its whole left subtree, then its whole right. Start at the root.', active: [0] },
+        { caption: 'Dive left to node 2…', visited: [0], active: [1] },
+        { caption: '…and left again to node 4, a leaf. Can\'t go deeper — back up.', visited: [0, 1], active: [3] },
+        { caption: 'Node 4\'s sibling: node 5. Left subtree of the root is now fully explored.', visited: [0, 1, 3], active: [4] },
+        { caption: 'Only now do we cross to the right subtree: node 3.', visited: [0, 1, 3, 4], active: [2] },
+        { caption: 'Node 6…', visited: [0, 1, 3, 4, 2], active: [5] },
+        { caption: 'Node 7. Every node visited exactly once → O(n).', visited: [0, 1, 3, 4, 2, 5], active: [6] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `The order you *touch* the node relative to its children gives the three DFS flavors: **preorder**
+(node, L, R — copy/serialize), **inorder** (L, node, R — yields a **BST in sorted order**), and
+**postorder** (L, R, node — when a node's answer depends on its children: height, subtree sums).
+
+**Breadth-first (BFS)** instead sweeps level by level using a **queue** — the right tool when distance
+from the root matters (shortest path in an unweighted tree, level-order output):`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'tree',
+      title: 'Breadth-first search: level by level',
+      nodes: [1, 2, 3, 4, 5, 6, 7],
+      frames: [
+        { caption: 'BFS uses a queue, visiting in rings of increasing depth. Level 0: just the root.', active: [0] },
+        { caption: 'Level 1: nodes 2 and 3, left to right.', visited: [0], active: [1, 2] },
+        { caption: 'Level 2: nodes 4, 5, 6, 7. BFS reaches nodes in order of distance from the root.', visited: [0, 1, 2], active: [3, 4, 5, 6] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `### Key points to remember
+
+- A tree is recursive by definition; the default tool is recursion with a clean base case (\`None\`/empty).
+- DFS = recursion/stack (pre/in/post-order); BFS = queue (level order).
+- **Inorder traversal of a BST is sorted** — a frequent building block.
+- Postorder is for "a node's answer depends on its children" (height, balance, subtree sums).
+- Most bugs are a missing base case or a wrong combine step — write the base case first.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'trees',
   title: 'Trees',
   order: 8,
   blurb: 'Recursion over hierarchy: DFS (pre/in/post-order) and BFS level-order traversal.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'invert-binary-tree',

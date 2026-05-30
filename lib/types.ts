@@ -128,6 +128,8 @@ export interface GridViz {
 /** Binary tree laid out from a level-order array; frames highlight node indices. */
 export interface TreeFrame {
   caption: string;
+  /** Override the node values for this frame (e.g. heap sift swapping values). */
+  nodes?: (number | string | null)[];
   active?: number[];
   visited?: number[];
   faded?: number[];

@@ -1,4 +1,4 @@
-import type { Topic } from '@/lib/types';
+import type { Topic, TutorialBlock } from '@/lib/types';
 
 const tutorial = `
 ## Tries — first principles
@@ -46,12 +46,79 @@ DFS over the tree.
 - Wildcard / pattern search over a trie is a DFS that branches on '.' into all children.
 `;
 
+const blocks: TutorialBlock[] = [
+  {
+    kind: 'md',
+    md: `## Tries — from first principles
+
+A trie (prefix tree) stores a set of strings as a tree where **each edge is a character** and each
+path from the root spells out a prefix. Words that begin the same way **share the same path** until
+they diverge. That shared structure is the whole point: it makes anything about **prefixes** — does
+any stored word start with "ca"? — answerable directly, which a hash set of whole words simply can't
+do.
+
+The two operations are just walks down the tree, each **O(L)** in the word length (independent of how
+many words are stored): \`search\` walks the characters and checks the final node is marked
+end-of-word; \`startsWith\` just checks the path exists. Trace a small trie holding "cat", "car", "dog":`,
+  },
+  {
+    kind: 'viz',
+    spec: {
+      type: 'graph',
+      title: 'A trie: shared prefixes are shared paths',
+      nodes: [
+        { id: '•', x: 0.05, y: 0.5 },
+        { id: 'c', x: 0.28, y: 0.3 },
+        { id: 'a', x: 0.5, y: 0.3 },
+        { id: 't', x: 0.72, y: 0.18 },
+        { id: 'r', x: 0.72, y: 0.45 },
+        { id: 'd', x: 0.28, y: 0.78 },
+        { id: 'o', x: 0.5, y: 0.78 },
+        { id: 'g', x: 0.72, y: 0.78 },
+      ],
+      edges: [
+        { from: '•', to: 'c', directed: true },
+        { from: 'c', to: 'a', directed: true },
+        { from: 'a', to: 't', directed: true },
+        { from: 'a', to: 'r', directed: true },
+        { from: '•', to: 'd', directed: true },
+        { from: 'd', to: 'o', directed: true },
+        { from: 'o', to: 'g', directed: true },
+      ],
+      frames: [
+        { caption: 'Each edge is a letter; a path from the root (•) spells a prefix. End-of-word nodes (t, r, g) finish a stored word.', active: ['•'] },
+        { caption: 'Search "cat": walk • → c → a → t. O(L), touching only this path.', active: ['•', 'c', 'a', 't'], visited: [] },
+        { caption: 'Add/search "car": it shares the prefix "ca" — the c→a path is reused, only "r" diverges.', active: ['•', 'c', 'a', 'r'] },
+        { caption: '"dog" shares no prefix with the others, so it gets its own branch from the root.', active: ['•', 'd', 'o', 'g'] },
+        { caption: 'startsWith("ca")? Walk • → c → a and we never fall off the tree → true.', active: ['•', 'c', 'a'] },
+      ],
+    },
+  },
+  {
+    kind: 'md',
+    md: `Each node holds a map from next-character → child plus an **end-of-word** flag (needed because a
+word like "car" can be a prefix of "cart"). A hash set could match whole words in O(L) too, but it
+**cannot** answer prefix queries without scanning everything — that's the trie's edge. Once words live
+in a trie, fuzzy matching (a \`.\` wildcard) is just a small DFS that branches into every child at the
+wildcard position.
+
+### Key points to remember
+
+- A trie shines for **prefix** queries; a hash set can't do prefixes efficiently.
+- Operations are O(L) in the word/prefix length, regardless of how many words are stored.
+- Mark **end-of-word** explicitly — a stored word may be a prefix of another.
+- Shared prefixes share nodes, which amortizes the (otherwise large) node/pointer memory cost.
+- Wildcard / pattern search over a trie is a DFS that branches on '.' into all children.`,
+  },
+];
+
 const topic: Topic = {
   slug: 'tries',
   title: 'Tries',
   order: 9,
   blurb: 'Prefix trees: O(L) insert/search/prefix queries and DFS-based wildcard matching.',
   tutorial,
+  blocks,
   problems: [
     {
       id: 'implement-trie',
