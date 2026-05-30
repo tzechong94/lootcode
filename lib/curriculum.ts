@@ -15,6 +15,10 @@ import dp1d from './content/dp-1d';
 import dp2d from './content/dp-2d';
 import greedy from './content/greedy';
 import intervals from './content/intervals';
+import advancedGraphs from './content/advanced-graphs';
+import unionFind from './content/union-find';
+import mathBit from './content/math-bit';
+import sortingDivideConquer from './content/sorting-divide-conquer';
 
 // The curriculum manifest: built topics in study order.
 // Add a topic by importing its module and appending it here.
@@ -35,6 +39,10 @@ export const TOPICS: Topic[] = [
   dp2d,
   greedy,
   intervals,
+  advancedGraphs,
+  unionFind,
+  mathBit,
+  sortingDivideConquer,
 ].sort((a, b) => a.order - b.order);
 
 // Full planned curriculum (for the landing-page roadmap). Built topics are
