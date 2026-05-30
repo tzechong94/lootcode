@@ -1,6 +1,6 @@
 # VISION — DSA Self-Study Platform ("lootcode")
 
-**Status: AWAITING SIGN-OFF** (spec gate — autopilot will not start grinding until approved)
+**Status: M0 + M1 complete — awaiting milestone checkpoint review**
 
 ## Vision
 
@@ -40,20 +40,20 @@ verify is green for it.
 ### Milestone 0 — Foundation
 | id | statement | verify | status |
 |----|-----------|--------|--------|
-| AC-01 | Next.js + TS app scaffolded with static export configured | `npm run build` produces `out/` and exits 0 | todo |
-| AC-02 | Content schema (Topic/Tutorial/Problem types) + curriculum manifest defined | `npm run typecheck` exits 0; manifest imports cleanly | todo |
-| AC-03 | JS execution harness runs a function against test cases in a Web Worker | unit check: sample JS solution passes its tests in-app | todo |
-| AC-04 | Python execution harness runs a function against test cases via Pyodide | unit check: sample Python solution passes its tests in-app | todo |
-| AC-05 | Generic in-app test runner: loads a problem, runs user code, diffs results, renders pass/fail per case | manual `[review]` + AC-03/04 checks | todo |
-| AC-06 | `npm run verify` validates every problem's reference solutions (py+js) against its tests | `npm run verify` exits 0 | todo |
-| AC-07 | App shell: topic sidebar, tutorial pane, problem view, Monaco editor, language switcher (py/js), Run button, results pane | `[review]` (visual) | todo |
+| AC-01 | Next.js + TS app scaffolded with static export configured | `npm run build` produces `out/` and exits 0 | **done** |
+| AC-02 | Content schema (Topic/Tutorial/Problem types) + curriculum manifest defined | `npm run typecheck` exits 0; manifest imports cleanly | **done** |
+| AC-03 | JS execution harness runs a function against test cases in a Web Worker | unit check: sample JS solution passes its tests in-app | **done** `[review]` |
+| AC-04 | Python execution harness runs a function against test cases via Pyodide | unit check: sample Python solution passes its tests in-app | **done** `[review]` |
+| AC-05 | Generic in-app test runner: loads a problem, runs user code, diffs results, renders pass/fail per case | manual `[review]` + AC-03/04 checks | **done** `[review]` |
+| AC-06 | `npm run verify` validates every problem's reference solutions (py+js) against its tests | `npm run verify` exits 0 | **done** |
+| AC-07 | App shell: topic sidebar, tutorial pane, problem view, Monaco editor, language switcher (py/js), Run button, results pane | `[review]` (visual) | **done** `[review]` |
 
 ### Milestone 1 — Vertical slice: Arrays & Hashing
 | id | statement | verify | status |
 |----|-----------|--------|--------|
-| AC-08 | Arrays & Hashing tutorial written (first-principles, key points, complexity) | `[review]` (prose) | todo |
-| AC-09 | 3 problems authored with starter + reference (py+js) + tests | `npm run verify` green for these | todo |
-| AC-10 | Topic renders end-to-end: read tutorial → open problem → solve in both langs → tests pass | `[review]` + verify | todo |
+| AC-08 | Arrays & Hashing tutorial written (first-principles, key points, complexity) | `[review]` (prose) | **done** `[review]` |
+| AC-09 | 3 problems authored with starter + reference (py+js) + tests | `npm run verify` green for these | **done** |
+| AC-10 | Topic renders end-to-end: read tutorial → open problem → solve in both langs → tests pass | `[review]` + verify | **done** `[review]` |
 
 ### Milestones 2–18 — Remaining topics (one milestone each)
 Each: **tutorial** (first-principles + key points) + **2–3 problems** with reference solutions in
@@ -87,16 +87,16 @@ These get expanded into the ledger as each milestone begins.
 
 | id | status |
 |----|--------|
-| AC-01 | todo |
-| AC-02 | todo |
-| AC-03 | todo |
-| AC-04 | todo |
-| AC-05 | todo |
-| AC-06 | todo |
-| AC-07 | todo |
-| AC-08 | todo |
-| AC-09 | todo |
-| AC-10 | todo |
+| AC-01 | done |
+| AC-02 | done |
+| AC-03 | done [review] |
+| AC-04 | done [review] |
+| AC-05 | done [review] |
+| AC-06 | done |
+| AC-07 | done [review] |
+| AC-08 | done [review] |
+| AC-09 | done |
+| AC-10 | done [review] |
 | (M2–M18 per-topic ACs expanded as each milestone begins) | — |
 | AC-90 | todo |
 | AC-91 | todo |
