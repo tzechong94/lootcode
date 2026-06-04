@@ -321,7 +321,7 @@ details.disclosure summary { cursor: pointer; color: var(--accent); font-size: 1
 
 /* Stack / queue */
 .vz-stack { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.vz-stack-items { display: flex; flex-direction: column-reverse; gap: 4px; }
+.vz-stack-items { display: flex; flex-direction: column; gap: 4px; }
 .vz-queue { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .vz-queue-items { display: flex; gap: 4px; }
 .vz-sq-cell {
