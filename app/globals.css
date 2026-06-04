@@ -94,6 +94,18 @@ pre code { background: none; padding: 0; }
 .roadmap-card .title { font-weight: 600; margin: 4px 0; }
 .roadmap-card .blurb { color: var(--text-dim); font-size: 13px; }
 .roadmap-card .soon-tag { font-size: 11px; color: var(--yellow); }
+.roadmap-card .card-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.roadmap-card .card-tag { font-size: 11px; color: var(--text-dim); border: 1px solid var(--border); border-radius: 999px; padding: 2px 8px; }
+.roadmap-card .card-tag.tag-build { color: var(--accent); border-color: var(--accent-dim); }
+
+.section-block { margin-top: 44px; }
+.section-head h2 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.02em; }
+.section-head p { color: var(--text-dim); font-size: 14px; margin: 0; }
+.family-group { margin-top: 22px; }
+.family-head { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin: 0 0 4px; font-weight: 600; }
+.family-group .roadmap-grid { margin-top: 10px; }
+
+.sidebar .nav-subsection { font-size: 11px; color: var(--text-dim); margin: 10px 0 4px 4px; opacity: 0.8; }
 
 /* ---------- Topic view ---------- */
 .topic-header h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -0.02em; }

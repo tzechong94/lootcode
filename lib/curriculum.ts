@@ -45,31 +45,6 @@ export const TOPICS: Topic[] = [
   sortingDivideConquer,
 ].sort((a, b) => a.order - b.order);
 
-// Full planned curriculum (for the landing-page roadmap). Built topics are
-// matched by title; the rest render as "coming soon".
-export const ROADMAP: string[] = [
-  'Arrays & Hashing',
-  'Two Pointers',
-  'Sliding Window',
-  'Binary Search',
-  'Sorting & Divide and Conquer',
-  'Stack',
-  'Queues & Deques',
-  'Linked Lists',
-  'Trees',
-  'Tries',
-  'Heap / Priority Queue',
-  'Backtracking',
-  'Graphs',
-  'Advanced Graphs',
-  '1-D Dynamic Programming',
-  '2-D Dynamic Programming',
-  'Greedy',
-  'Intervals',
-  'Math & Bit Manipulation',
-  'Union-Find',
-];
-
 // ===== Section & family groupings =====
 
 /** Data-structure topics, in study order. */
