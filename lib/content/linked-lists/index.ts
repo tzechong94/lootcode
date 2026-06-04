@@ -1,4 +1,5 @@
 import type { Topic, TutorialBlock } from '@/lib/types';
+import implementations from './implement';
 
 const PREAMBLE_PY = `class ListNode:
     def __init__(self, val=0, next=None):
@@ -188,6 +189,7 @@ const topic: Topic = {
   blurb: 'Pointer manipulation: dummy heads, in-place reversal, and fast/slow two-pointer tricks.',
   tutorial,
   blocks,
+  implementations,
   problems: [
     {
       id: 'reverse-linked-list',

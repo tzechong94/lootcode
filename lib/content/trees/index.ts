@@ -1,4 +1,5 @@
 import type { Topic, TutorialBlock } from '@/lib/types';
+import implementations from './implement';
 
 const PREAMBLE_PY = `class TreeNode:
     def __init__(self, val=0, left=None, right=None):
@@ -198,6 +199,7 @@ const topic: Topic = {
   blurb: 'Recursion over hierarchy: DFS (pre/in/post-order) and BFS level-order traversal.',
   tutorial,
   blocks,
+  implementations,
   problems: [
     {
       id: 'invert-binary-tree',

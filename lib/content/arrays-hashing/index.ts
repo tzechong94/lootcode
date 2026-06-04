@@ -1,4 +1,5 @@
 import type { Topic, TutorialBlock } from '@/lib/types';
+import implementations from './implement';
 
 const tutorial = `
 ## Arrays & Hashing — first principles
@@ -178,6 +179,7 @@ const topic: Topic = {
   blurb: 'Trade space for time: use hash sets and maps to collapse O(n²) scans into O(n).',
   tutorial,
   blocks,
+  implementations,
   problems: [
     {
       id: 'two-sum',

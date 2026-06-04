@@ -1,4 +1,5 @@
 import type { Topic, TutorialBlock } from '@/lib/types';
+import implementations from './implement';
 
 // Provided to JS solutions (JS has no built-in heap). Python uses heapq.
 const MINHEAP_JS = `class MinHeap {
@@ -153,6 +154,7 @@ const topic: Topic = {
   blurb: 'Fast access to the current extreme: top-k, merging, and greedy "consume the max" patterns.',
   tutorial,
   blocks,
+  implementations,
   problems: [
     {
       id: 'kth-largest-element',

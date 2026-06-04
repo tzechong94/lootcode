@@ -1,4 +1,5 @@
 import type { Topic, TutorialBlock } from '@/lib/types';
+import implementations from './implement';
 
 const tutorial = `
 ## Queues & Deques — first principles
@@ -107,6 +108,7 @@ const topic: Topic = {
   blurb: 'FIFO processing for BFS, plus the monotonic deque for O(n) sliding-window extremes.',
   tutorial,
   blocks,
+  implementations,
   problems: [
     {
       id: 'implement-queue-using-stacks',

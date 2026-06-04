@@ -1,4 +1,5 @@
 import type { Topic, TutorialBlock } from '@/lib/types';
+import implementations from './implement';
 
 const tutorial = `
 ## Tries — first principles
@@ -120,6 +121,7 @@ const topic: Topic = {
   blurb: 'Prefix trees: O(L) insert/search/prefix queries and DFS-based wildcard matching.',
   tutorial,
   blocks,
+  implementations,
   problems: [
     {
       id: 'implement-trie',

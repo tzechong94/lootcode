@@ -1,4 +1,5 @@
 import type { Topic, TutorialBlock } from '@/lib/types';
+import implementations from './implement';
 
 const UF_NODES = [
   { id: 0, x: 0.15, y: 0.25 },
@@ -155,6 +156,7 @@ const topic: Topic = {
   blurb: 'Disjoint sets for dynamic connectivity: count components, detect cycles, build MSTs.',
   tutorial,
   blocks,
+  implementations,
   problems: [
     {
       id: 'count-components',
