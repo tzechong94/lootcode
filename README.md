@@ -1,12 +1,20 @@
 # lootcode
 
 A static, browser-based platform for self-studying **data structures & algorithms** and getting
-interview-ready. It's **tutorial-first**: each topic opens with a first-principles lesson — prose
-interleaved with **interactive concept visualizers** (step through a hash table filling, a binary
-search halving its range, BFS expanding in rings, a heap sifting, union-find merging sets) — then a
-few problems you solve in an in-browser editor: write **Python or JavaScript**, run it against real
-tests, and see pass/fail. Everything runs client-side (Python via Pyodide, JS via a Web Worker), so
-it deploys as a static site with no backend.
+interview-ready. The curriculum is split into two sections, both **tutorial-first** with
+**interactive concept visualizers** (step through a hash table filling, a binary search halving its
+range, BFS expanding in rings, a heap sifting, union-find merging sets):
+
+- **Data Structures** — learn how each structure works, then **implement it yourself**
+  (CSPrimer-style): you write a real class (`Stack`, `Queue`, `Deque`, `HashMap`, `LinkedList`,
+  `BST`, `Trie`, `MinHeap`, `DSU`) and a scripted **sequence of operations** runs against your
+  instance to check it. Then you apply it via the topic's problems. Flow: *Tutorial → Build → Apply*.
+- **Algorithms** — first-principles techniques, organized by **family** (Searching, Sorting &
+  Divide and Conquer, Two Pointers & Sliding Window, Graph Traversal, Backtracking, Dynamic
+  Programming, Greedy, Intervals, Math & Bit), each derived from the problem it solves.
+
+You write **Python or JavaScript**, run it against real tests, and see pass/fail. Everything runs
+client-side (Python via Pyodide, JS via a Web Worker), so it deploys as a static site with no backend.
 
 The visualizers are built from a small reusable library (`components/viz/`): a generic `<Stepper>`
 (prev/next/play) plus renderers for arrays, grids, trees, linked lists, stacks/queues, hash buckets,
@@ -15,12 +23,14 @@ bits, graphs, and timelines. A topic's tutorial is an ordered list of blocks (`{
 
 ## Curriculum
 
-20 topics, ~63 problems, each with reference solutions in both languages:
+20 topics, all with reference solutions in both languages.
 
-Arrays & Hashing · Two Pointers · Sliding Window · Binary Search · Sorting & Divide and Conquer ·
-Stack · Queues & Deques · Linked Lists · Trees · Tries · Heap / Priority Queue · Backtracking ·
-Graphs · Advanced Graphs · 1-D DP · 2-D DP · Greedy · Intervals · Math & Bit Manipulation ·
-Union-Find.
+**Data Structures** (each with an implement-it-yourself build): Arrays & Hashing · Stack ·
+Queues & Deques · Linked Lists · Trees · Tries · Heap / Priority Queue · Union-Find.
+
+**Algorithms** (by family): Binary Search · Sorting & Divide and Conquer · Two Pointers ·
+Sliding Window · Graphs · Advanced Graphs · Backtracking · 1-D DP · 2-D DP · Greedy · Intervals ·
+Math & Bit Manipulation.
 
 ## Tech stack
 
@@ -50,34 +60,40 @@ npm run typecheck  # tsc --noEmit
 npm run lint       # next lint
 ```
 
-`npm run verify` is the project's core invariant: **every problem ships reference solutions in both
-Python and JS that pass its own test suite.** It runs JS in a Node `vm` and Python via the system
-`python3` (no browser needed), and exits non-zero if any reference fails. Requires `python3` on PATH.
+`npm run verify` is the project's core invariant: **every exercise — problems AND implement-it-
+yourself builds — ships reference solutions in both Python and JS that pass its own test suite.** It
+runs JS in a Node `vm` and Python via the system `python3` (no browser needed), and exits non-zero if
+any reference fails. Requires `python3` on PATH.
 
 ## Adding content
 
-1. Create `lib/content/<slug>/index.ts` exporting a `Topic` (see `lib/types.ts` for the schema).
-   A topic has a markdown `tutorial` and a list of `Problem`s.
+1. Create `lib/content/<slug>/index.ts` exporting a `Topic` (see `lib/types.ts` for the schema). A
+   topic has a markdown `tutorial`/`blocks`, a `section` (`'data-structure'` | `'algorithm'`, plus a
+   `family` for algorithms), optional `implementations`, and a list of `Problem`s.
 2. Each `Problem` needs: statement, `functionName`/`starter`/`reference` per language, `tests`
    (`{ input: [...args], expected }`), and optionally `compare` (`'deep'` | `'unordered'` |
-   `'unorderedOuter'`), `preamble` (helper code injected before user code, e.g. a `ListNode`/`DSU`
-   class), `hints`, and `complexity`.
-3. Register the topic in `lib/curriculum.ts` (import + add to `TOPICS`; add its title to `ROADMAP`).
-4. Run `npm run verify` — it must stay green before you commit.
+   `'unorderedOuter'`), `preamble`, `hints`, and `complexity`.
+3. Each `Implementation` (implement-it-yourself build) needs: `statement`, `className`/`starter`/
+   `reference` per language, and `tests` — a list of `DsTestCase`s, each an ordered list of `DsOp`s
+   (`{ call, args?, expect? }`) run against one fresh instance. Use `methodAliases` to keep method
+   names idiomatic per language (e.g. `is_empty` in Python, `isEmpty` in JS). Builds live in a sibling
+   `lib/content/<slug>/implement.ts`.
+4. Register the topic in `lib/curriculum.ts` (import + add to `TOPICS`).
+5. Run `npm run verify` — it must stay green before you commit.
 
 ## Project layout
 
 ```
 app/                     Next.js routes (landing, /topics/[slug]) + global CSS
-components/              Sidebar, TopicView, ProblemWorkspace, CodeEditor, Markdown
+components/              Sidebar, TopicView, ProblemWorkspace, ImplementWorkspace, CodeEditor, Markdown
 lib/
-  types.ts               Topic / Problem / TestCase schema
-  curriculum.ts          the manifest (TOPICS + ROADMAP)
+  types.ts               Topic / Problem / Implementation / TestCase / DsOp schema
+  curriculum.ts          the manifest (TOPICS + section/family groupings)
   compare.ts             result comparison (deep / unordered / unorderedOuter)
-  runners.ts             in-browser execution (Web Worker for JS, Pyodide for Python)
+  runners.ts             in-browser execution (runProblem + runImplementation; Web Worker / Pyodide)
   progress.ts            localStorage solved-state + code drafts
-  content/<slug>/        one folder per topic
-scripts/verify.mts       build-time reference-solution checker (Node + python3)
+  content/<slug>/        one folder per topic (index.ts; implement.ts for DS builds)
+scripts/verify.mts       build-time reference checker — problems + implementations (Node + python3)
 ```
 
 Built autonomously with the `autopilot` skill (`.claude/skills/autopilot/`); see `VISION.md` for the

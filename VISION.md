@@ -98,7 +98,7 @@ check, with the dev server stopped.
 
 ## Phase 3 — Data Structures ⟂ Algorithms (current)
 
-**Status: 🚧 IN PROGRESS (autopilot). Started 2026-06-04.**
+**Status: ✅ COMPLETE (autopilot). 2026-06-04. verify 72/72 · typecheck · lint · build all green. Awaiting final review.**
 
 ### Vision
 Go further first-principles by **separating data structures from algorithms** into two distinct
@@ -184,23 +184,23 @@ short "how it's built" tutorial framing. AC `P3-ds-<slug>`: verify = `npm run ve
 ### Ledger
 | id | status |
 |----|--------|
-| P3-01 | todo |
-| P3-02 | todo |
-| P3-03 | todo |
-| P3-04 | todo |
-| P3-05 | todo |
-| P3-06 | todo |
-| P3-07 | todo |
-| P3-08 | todo |
-| P3-09 | todo |
-| P3-10 | todo |
-| P3-11 | todo |
-| P3-12 | todo |
-| P3-13 | todo |
-| P3-14 | todo |
-| P3-15 | todo |
-| P3-16 | todo |
-| P3-99 | todo |
+| P3-01 | done |
+| P3-02 | done `[review]` |
+| P3-03 | done |
+| P3-04 | done |
+| P3-05 | done |
+| P3-06 | done `[review]` |
+| P3-07 | done |
+| P3-08 | done |
+| P3-09 | done |
+| P3-10 | done |
+| P3-11 | done |
+| P3-12 | done |
+| P3-13 | done |
+| P3-14 | done |
+| P3-15 | done `[review]` |
+| P3-16 | done `[review]` (Phase 2 prose already first-principles; all 12 algo topics assessed STRONG) |
+| P3-99 | done |
 
 ### Possible follow-ups (Phase 3, out of scope)
 - Animated step-through of the learner's own structure as ops run; complexity self-check per method;
