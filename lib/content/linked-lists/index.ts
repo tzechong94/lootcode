@@ -184,6 +184,7 @@ const topic: Topic = {
   slug: 'linked-lists',
   title: 'Linked Lists',
   order: 7,
+  section: 'data-structure',
   blurb: 'Pointer manipulation: dummy heads, in-place reversal, and fast/slow two-pointer tricks.',
   tutorial,
   blocks,

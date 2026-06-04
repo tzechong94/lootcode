@@ -137,6 +137,8 @@ const topic: Topic = {
   slug: 'backtracking',
   title: 'Backtracking',
   order: 11,
+  section: 'algorithm',
+  family: 'Backtracking',
   blurb: 'DFS over choices with undo + pruning: generate subsets, permutations, and combinations.',
   tutorial,
   blocks,

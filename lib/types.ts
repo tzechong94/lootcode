@@ -53,10 +53,32 @@ export interface Problem {
   complexity?: { time: string; space: string };
 }
 
+/** Top-level division of the curriculum. */
+export type Section = 'data-structure' | 'algorithm';
+
+/**
+ * Family an algorithm topic belongs to (for grouping the Algorithms section).
+ * Data-structure topics leave this undefined.
+ */
+export type AlgoFamily =
+  | 'Searching'
+  | 'Sorting & Divide and Conquer'
+  | 'Two Pointers & Sliding Window'
+  | 'Graph Traversal'
+  | 'Backtracking'
+  | 'Dynamic Programming'
+  | 'Greedy'
+  | 'Intervals'
+  | 'Math & Bit';
+
 export interface Topic {
   slug: string;
   title: string;
   order: number;
+  /** Which half of the curriculum this topic lives in. */
+  section: Section;
+  /** For `section: 'algorithm'` topics — the family they group under. */
+  family?: AlgoFamily;
   /** One-line description for the sidebar / landing page. */
   blurb: string;
   /** Markdown tutorial: first-principles explanation + key points. */
@@ -67,7 +89,56 @@ export interface Topic {
    * to the interactive format one at a time.
    */
   blocks?: TutorialBlock[];
+  /**
+   * For data-structure topics: "implement the structure yourself" exercises.
+   * The learner writes a class; a scripted sequence of operations checks it.
+   */
+  implementations?: Implementation[];
   problems: Problem[];
+}
+
+// ===== Implement-it-yourself exercises (data structures) =====
+// A learner writes a real class (e.g. Stack) and a scripted sequence of operations
+// runs against one fresh instance, optionally asserting the return of each call.
+
+/** One step in an op-sequence: construct (`call: 'new'`) or invoke a method. */
+export interface DsOp {
+  /** Method name to call, or `'new'` to (re)construct the instance with `args`. */
+  call: string;
+  /** Positional arguments for the call. */
+  args?: unknown[];
+  /** When present, the call's return value is compared against this (omit for void ops like push). */
+  expect?: unknown;
+}
+
+/** An ordered list of ops run against a single fresh instance. */
+export interface DsTestCase {
+  /** Optional human label shown in the results pane. */
+  name?: string;
+  ops: DsOp[];
+}
+
+/** "Implement this data structure" exercise. */
+export interface Implementation {
+  id: string;
+  title: string;
+  /** Markdown brief: what to build and the method contracts. */
+  statement: string;
+  /** Optional method reference shown in the UI (name + signature + one-line contract). */
+  methods?: { name: string; sig: string; doc: string }[];
+  /** Class the harness instantiates, per language (e.g. { py: 'Stack', js: 'Stack' }). */
+  className: Record<Lang, string>;
+  /** Optional helper code prepended before user/reference code in every execution path. */
+  preamble?: Partial<Record<Lang, string>>;
+  /** Editor starting code (class skeleton), per language. */
+  starter: Record<Lang, string>;
+  /** Reference implementation that MUST pass `tests`, per language. */
+  reference: Record<Lang, string>;
+  tests: DsTestCase[];
+  /** How each op's return value is compared (default 'deep'). */
+  compare?: CompareMode;
+  hints?: string[];
+  complexity?: { time: string; space: string };
 }
 
 // ===== Interactive tutorial blocks =====

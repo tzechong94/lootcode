@@ -103,6 +103,7 @@ const topic: Topic = {
   slug: 'queues-deques',
   title: 'Queues & Deques',
   order: 6,
+  section: 'data-structure',
   blurb: 'FIFO processing for BFS, plus the monotonic deque for O(n) sliding-window extremes.',
   tutorial,
   blocks,

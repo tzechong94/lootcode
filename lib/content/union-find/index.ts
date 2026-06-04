@@ -151,6 +151,7 @@ const topic: Topic = {
   slug: 'union-find',
   title: 'Union-Find',
   order: 19,
+  section: 'data-structure',
   blurb: 'Disjoint sets for dynamic connectivity: count components, detect cycles, build MSTs.',
   tutorial,
   blocks,

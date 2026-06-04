@@ -148,6 +148,8 @@ const topic: Topic = {
   slug: 'graphs',
   title: 'Graphs',
   order: 12,
+  section: 'algorithm',
+  family: 'Graph Traversal',
   blurb: 'Nodes and edges (including grids): DFS for components, BFS for shortest paths, topological order.',
   tutorial,
   blocks,

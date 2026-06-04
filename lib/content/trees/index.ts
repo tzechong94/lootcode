@@ -194,6 +194,7 @@ const topic: Topic = {
   slug: 'trees',
   title: 'Trees',
   order: 8,
+  section: 'data-structure',
   blurb: 'Recursion over hierarchy: DFS (pre/in/post-order) and BFS level-order traversal.',
   tutorial,
   blocks,

@@ -98,6 +98,8 @@ const topic: Topic = {
   slug: 'greedy',
   title: 'Greedy',
   order: 16,
+  section: 'algorithm',
+  family: 'Greedy',
   blurb: 'Commit to the locally-optimal choice — when a local optimum is provably global.',
   tutorial,
   blocks,

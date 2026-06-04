@@ -156,6 +156,8 @@ const topic: Topic = {
   slug: 'advanced-graphs',
   title: 'Advanced Graphs',
   order: 13,
+  section: 'algorithm',
+  family: 'Graph Traversal',
   blurb: 'Weighted graphs and global structure: BFS state-search, Dijkstra, and minimum spanning trees.',
   tutorial,
   blocks,

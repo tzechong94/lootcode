@@ -104,6 +104,8 @@ const topic: Topic = {
   slug: 'two-pointers',
   title: 'Two Pointers',
   order: 2,
+  section: 'algorithm',
+  family: 'Two Pointers & Sliding Window',
   blurb: 'Coordinate two indices to turn nested-loop pair searches into a single O(n) pass.',
   tutorial,
   blocks,

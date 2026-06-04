@@ -174,6 +174,7 @@ const topic: Topic = {
   slug: 'arrays-hashing',
   title: 'Arrays & Hashing',
   order: 1,
+  section: 'data-structure',
   blurb: 'Trade space for time: use hash sets and maps to collapse O(n²) scans into O(n).',
   tutorial,
   blocks,

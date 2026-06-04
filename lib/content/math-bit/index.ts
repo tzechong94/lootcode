@@ -96,6 +96,8 @@ const topic: Topic = {
   slug: 'math-bit',
   title: 'Math & Bit Manipulation',
   order: 18,
+  section: 'algorithm',
+  family: 'Math & Bit',
   blurb: 'Operate on bits directly: XOR cancellation, set-bit counting, and number-theory staples.',
   tutorial,
   blocks,

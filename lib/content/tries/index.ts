@@ -116,6 +116,7 @@ const topic: Topic = {
   slug: 'tries',
   title: 'Tries',
   order: 9,
+  section: 'data-structure',
   blurb: 'Prefix trees: O(L) insert/search/prefix queries and DFS-based wildcard matching.',
   tutorial,
   blocks,

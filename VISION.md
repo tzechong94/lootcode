@@ -93,3 +93,115 @@ check, with the dev server stopped.
 ### Possible follow-ups (out of scope)
 - User-editable inputs that drive the visualization live; animated auto-play with speed control;
   complexity-curve charts; per-step pseudocode highlighting synced to the diagram.
+
+---
+
+## Phase 3 — Data Structures ⟂ Algorithms (current)
+
+**Status: 🚧 IN PROGRESS (autopilot). Started 2026-06-04.**
+
+### Vision
+Go further first-principles by **separating data structures from algorithms** into two distinct
+sections, each with the format/aesthetic of the current site.
+
+- **Data Structures** — for each structure (stack, queue/deque, linked list, hash map, tree, trie,
+  heap, union-find) the learner reads a short "how it's built" tutorial and then **implements the
+  structure themselves** (CSPrimer-style): they write a real class with its methods, and a scripted
+  **sequence of operations** runs against their implementation to check it. After building it, they
+  **apply** it via the topic's existing problems. Flow per DS topic: *Tutorial → Implement → Apply*.
+- **Algorithms** — first-principles, **categorized by family** (Searching, Sorting & Divide and
+  Conquer, Two Pointers & Sliding Window, Graph Traversal, Backtracking, Dynamic Programming,
+  Greedy, Intervals, Math & Bit). Each topic derives the technique from the problem it solves.
+
+### Approach (technical)
+- Add `section: 'data-structure' | 'algorithm'` to every `Topic`, plus `family` for algorithm topics.
+  Navigation (landing + sidebar) groups by section; algorithms sub-grouped by family.
+- New exercise type `Implementation` on DS topics: a class the learner writes, verified by
+  `DsTestCase`s — each an ordered list of `DsOp` (`{ call, args?, expect? }`) run against one fresh
+  instance. Dual-language (Python class / JS class), same in-browser run + the `verify` invariant.
+- New `runImplementation` runner (JS Web Worker + Pyodide op-sequence) and `verify.mts` extension so
+  every implementation's reference solution is build-gated exactly like problems.
+- New `ImplementWorkspace` UI mirroring `ProblemWorkspace`; `TopicView` shows Tutorial → Implement(s)
+  → Problems tabs. Reuses Monaco editor, progress (localStorage), results pane.
+
+### Section mapping (reorganize the existing 20 in place)
+- **Data Structures (8):** arrays-hashing, stack, queues-deques, linked-lists, trees, tries,
+  heap-priority-queue, union-find. Each gets ≥1 implement-it-yourself exercise; existing problems kept as "Apply".
+- **Algorithms (12):** binary-search (Searching); sorting-divide-conquer (Sorting & D&C);
+  two-pointers + sliding-window (Two Pointers & Sliding Window); graphs + advanced-graphs (Graph
+  Traversal); backtracking (Backtracking); dp-1d + dp-2d (Dynamic Programming); greedy (Greedy);
+  intervals (Intervals); math-bit (Math & Bit).
+
+### Guardrails
+- Existing problems, tests, and the `verify` invariant must stay green — additive + reorganizing only.
+- Implementations are build-gated: every `Implementation.reference` must pass its op-sequence tests in BOTH languages (`npm run verify`).
+- Dual-language parity: every implementation ships Python AND JS starter + reference.
+- No pushing/deploying without explicit OK. Commit per green criterion.
+- Full autopilot: no per-milestone pause unless blocked; user requested unattended completion.
+- Avoid `npm run build` while `next dev` runs (shared `.next`) — verify per-iteration with typecheck + lint; full build only at ship.
+
+### Milestones & acceptance criteria
+
+#### M3-A — Sections & navigation
+| id | statement | verify | status |
+|----|-----------|--------|--------|
+| P3-01 | `Topic` gains `section` + optional `family`; all 20 topics tagged; curriculum exposes section/family groupings | `npm run typecheck` green | todo |
+| P3-02 | Landing page + sidebar render two sections (Data Structures, Algorithms by family) keeping current aesthetic | typecheck + lint green + `[review]` | todo |
+
+#### M3-B — Implement-it-yourself harness
+| id | statement | verify | status |
+|----|-----------|--------|--------|
+| P3-03 | Schema: `Implementation` + `DsTestCase` + `DsOp` types added to `lib/types.ts`; `Topic.implementations?` | typecheck green | todo |
+| P3-04 | `runImplementation` (JS worker + Pyodide op-sequence) in `lib/runners.ts` | typecheck green | todo |
+| P3-05 | `verify.mts` extended: every `Implementation.reference` runs its op-sequence in JS + Py; exits non-zero on failure | `npm run verify` green incl. impls | todo |
+| P3-06 | `ImplementWorkspace` UI + `TopicView` shows Tutorial → Implement(s) → Problems | typecheck + lint green + `[review]` | todo |
+| P3-07 | Pilot: Stack implementation authored (class + ops), reference passes verify in both languages | `npm run verify` green | todo |
+
+#### M3-C — Data Structures: implement exercises for all DS topics
+Per DS topic, author one implement-it-yourself exercise with a passing dual-language reference + a
+short "how it's built" tutorial framing. AC `P3-ds-<slug>`: verify = `npm run verify` green for that impl.
+| id | structure | verify | status |
+|----|-----------|--------|--------|
+| P3-08 | arrays-hashing → HashMap (chaining, put/get/remove/keys) | verify green | todo |
+| P3-09 | queues-deques → Queue + Deque (ring buffer) | verify green | todo |
+| P3-10 | linked-lists → LinkedList (push/pop/insert/remove/get) | verify green | todo |
+| P3-11 | trees → BST (insert/contains/inorder/min) | verify green | todo |
+| P3-12 | tries → Trie (insert/search/startsWith) | verify green | todo |
+| P3-13 | heap-priority-queue → MinHeap (push/pop/peek) | verify green | todo |
+| P3-14 | union-find → DSU (find/union/connected with path compression) | verify green | todo |
+
+#### M3-D — Algorithms: first-principles by family
+| id | statement | verify | status |
+|----|-----------|--------|--------|
+| P3-15 | Every algorithm topic assigned a family; algorithms shown grouped by family | typecheck + lint green + `[review]` | todo |
+| P3-16 | Each algorithm topic opens by deriving the technique from first principles (fill any gaps) | `[review]` | todo |
+
+#### M3-E — Ship
+| id | statement | verify | status |
+|----|-----------|--------|--------|
+| P3-99 | Full `npm run verify` (problems + implementations) + typecheck + lint + build all green; README + VISION updated to describe the DS/Algo split + implement-it-yourself | all commands exit 0 | todo |
+
+### Ledger
+| id | status |
+|----|--------|
+| P3-01 | todo |
+| P3-02 | todo |
+| P3-03 | todo |
+| P3-04 | todo |
+| P3-05 | todo |
+| P3-06 | todo |
+| P3-07 | todo |
+| P3-08 | todo |
+| P3-09 | todo |
+| P3-10 | todo |
+| P3-11 | todo |
+| P3-12 | todo |
+| P3-13 | todo |
+| P3-14 | todo |
+| P3-15 | todo |
+| P3-16 | todo |
+| P3-99 | todo |
+
+### Possible follow-ups (Phase 3, out of scope)
+- Animated step-through of the learner's own structure as ops run; complexity self-check per method;
+  "stress test" mode (randomized op sequences); visual diff of expected vs actual instance state.

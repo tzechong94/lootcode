@@ -95,6 +95,8 @@ const topic: Topic = {
   slug: 'intervals',
   title: 'Intervals',
   order: 17,
+  section: 'algorithm',
+  family: 'Intervals',
   blurb: 'Sort by the right key, then sweep: merge overlaps or pack the most non-overlapping ranges.',
   tutorial,
   blocks,

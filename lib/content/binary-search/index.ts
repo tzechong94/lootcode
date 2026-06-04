@@ -102,6 +102,8 @@ const topic: Topic = {
   slug: 'binary-search',
   title: 'Binary Search',
   order: 4,
+  section: 'algorithm',
+  family: 'Searching',
   blurb: 'Halve a monotonic search space each step — including searching over the answer itself.',
   tutorial,
   blocks,

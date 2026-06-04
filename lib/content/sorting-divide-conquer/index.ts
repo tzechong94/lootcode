@@ -103,6 +103,8 @@ const topic: Topic = {
   slug: 'sorting-divide-conquer',
   title: 'Sorting & Divide and Conquer',
   order: 4.5,
+  section: 'algorithm',
+  family: 'Sorting & Divide and Conquer',
   blurb: 'Divide, conquer, combine: merge sort, inversion counting, and fast exponentiation.',
   tutorial,
   blocks,

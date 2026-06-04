@@ -107,6 +107,7 @@ const topic: Topic = {
   slug: 'stack',
   title: 'Stack',
   order: 5,
+  section: 'data-structure',
   blurb: 'LIFO structure for matching/nesting and the monotonic-stack "next greater element" pattern.',
   tutorial,
   blocks,

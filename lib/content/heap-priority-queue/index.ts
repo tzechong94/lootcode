@@ -149,6 +149,7 @@ const topic: Topic = {
   slug: 'heap-priority-queue',
   title: 'Heap / Priority Queue',
   order: 10,
+  section: 'data-structure',
   blurb: 'Fast access to the current extreme: top-k, merging, and greedy "consume the max" patterns.',
   tutorial,
   blocks,

@@ -97,6 +97,8 @@ const topic: Topic = {
   slug: 'dp-2d',
   title: '2-D Dynamic Programming',
   order: 15,
+  section: 'algorithm',
+  family: 'Dynamic Programming',
   blurb: 'Two-index states: grid-path DP and two-sequence DP (LCS, edit distance) via the diagonal.',
   tutorial,
   blocks,

@@ -1,4 +1,4 @@
-import type { Problem, Topic } from './types';
+import type { AlgoFamily, Problem, Topic } from './types';
 import arraysHashing from './content/arrays-hashing';
 import twoPointers from './content/two-pointers';
 import slidingWindow from './content/sliding-window';
@@ -69,6 +69,35 @@ export const ROADMAP: string[] = [
   'Math & Bit Manipulation',
   'Union-Find',
 ];
+
+// ===== Section & family groupings =====
+
+/** Data-structure topics, in study order. */
+export const DATA_STRUCTURE_TOPICS: Topic[] = TOPICS.filter((t) => t.section === 'data-structure');
+
+/** Algorithm topics, in study order. */
+export const ALGORITHM_TOPICS: Topic[] = TOPICS.filter((t) => t.section === 'algorithm');
+
+/** Display order for algorithm families. */
+export const FAMILY_ORDER: AlgoFamily[] = [
+  'Searching',
+  'Sorting & Divide and Conquer',
+  'Two Pointers & Sliding Window',
+  'Graph Traversal',
+  'Backtracking',
+  'Dynamic Programming',
+  'Greedy',
+  'Intervals',
+  'Math & Bit',
+];
+
+/** Algorithm topics grouped by family, families in `FAMILY_ORDER`, topics in study order. */
+export function algorithmsByFamily(): { family: AlgoFamily; topics: Topic[] }[] {
+  return FAMILY_ORDER.map((family) => ({
+    family,
+    topics: ALGORITHM_TOPICS.filter((t) => t.family === family),
+  })).filter((g) => g.topics.length > 0);
+}
 
 export function getTopic(slug: string): Topic | undefined {
   return TOPICS.find((t) => t.slug === slug);

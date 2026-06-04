@@ -109,6 +109,8 @@ const topic: Topic = {
   slug: 'sliding-window',
   title: 'Sliding Window',
   order: 3,
+  section: 'algorithm',
+  family: 'Two Pointers & Sliding Window',
   blurb: 'Maintain a moving contiguous range with an O(1)-updatable summary to get O(n) subarray answers.',
   tutorial,
   blocks,

@@ -91,6 +91,8 @@ const topic: Topic = {
   slug: 'dp-1d',
   title: '1-D Dynamic Programming',
   order: 14,
+  section: 'algorithm',
+  family: 'Dynamic Programming',
   blurb: 'Solve overlapping subproblems once: linear-state recurrences for counts, min/max, and reachability.',
   tutorial,
   blocks,
