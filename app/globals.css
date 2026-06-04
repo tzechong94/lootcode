@@ -132,8 +132,14 @@ pre code { background: none; padding: 0; }
 .diff-Easy { color: var(--green); background: rgba(63,185,80,0.12); }
 .diff-Medium { color: var(--yellow); background: rgba(210,153,34,0.12); }
 .diff-Hard { color: var(--red); background: rgba(248,81,73,0.12); }
+.diff-build { color: var(--accent); background: var(--accent-dim); }
 .meta-row { display: flex; gap: 10px; align-items: center; margin: 8px 0 16px; }
 .solved-check { color: var(--green); font-size: 13px; }
+
+.method-table { border-collapse: collapse; margin: 14px 0; width: 100%; }
+.method-table td { border: 1px solid var(--border); padding: 7px 10px; font-size: 13px; vertical-align: top; }
+.method-table td:first-child { white-space: nowrap; color: var(--accent); }
+.method-table td:last-child { color: var(--text-dim); }
 
 .example { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin: 10px 0; font-family: var(--mono); font-size: 13px; white-space: pre-wrap; }
 .example .lbl { color: var(--text-dim); }

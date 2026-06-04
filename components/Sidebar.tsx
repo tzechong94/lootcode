@@ -3,14 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { DATA_STRUCTURE_TOPICS, algorithmsByFamily, allProblems } from '@/lib/curriculum';
+import { DATA_STRUCTURE_TOPICS, algorithmsByFamily, totalExercises } from '@/lib/curriculum';
 import type { Topic } from '@/lib/types';
 import { getSolved } from '@/lib/progress';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [solvedCount, setSolvedCount] = useState(0);
-  const totalProblems = allProblems().length;
+  const total = totalExercises();
   const families = algorithmsByFamily();
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export default function Sidebar() {
       <div className="tagline">DSA, from first principles — in your browser.</div>
 
       <div className="nav-section">Progress</div>
-      <span className="nav-item"><span>Problems solved</span><span className="badge">{solvedCount}/{totalProblems}</span></span>
+      <span className="nav-item"><span>Exercises done</span><span className="badge">{solvedCount}/{total}</span></span>
 
       <div className="nav-section">Data Structures</div>
       {DATA_STRUCTURE_TOPICS.map(link)}

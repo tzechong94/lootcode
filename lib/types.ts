@@ -128,6 +128,13 @@ export interface Implementation {
   methods?: { name: string; sig: string; doc: string }[];
   /** Class the harness instantiates, per language (e.g. { py: 'Stack', js: 'Stack' }). */
   className: Record<Lang, string>;
+  /**
+   * Per-language method-name overrides so each language stays idiomatic while op
+   * sequences use one canonical name. Maps canonical op name → real method name.
+   * E.g. `{ py: { isEmpty: 'is_empty', pushFront: 'push_front' } }`. The `'new'`
+   * op is never aliased. Unmapped names are used as-is.
+   */
+  methodAliases?: Partial<Record<Lang, Record<string, string>>>;
   /** Optional helper code prepended before user/reference code in every execution path. */
   preamble?: Partial<Record<Lang, string>>;
   /** Editor starting code (class skeleton), per language. */

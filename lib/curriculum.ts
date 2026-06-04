@@ -85,3 +85,8 @@ export function getProblem(topicSlug: string, problemId: string): Problem | unde
 export function allProblems(): Problem[] {
   return TOPICS.flatMap((t) => t.problems);
 }
+
+/** Total count of gradable exercises (problems + implement-it-yourself builds). */
+export function totalExercises(): number {
+  return TOPICS.reduce((n, t) => n + t.problems.length + (t.implementations?.length ?? 0), 0);
+}

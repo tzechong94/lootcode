@@ -1,4 +1,4 @@
-import type { Topic, TutorialBlock } from '@/lib/types';
+import type { Implementation, Topic, TutorialBlock } from '@/lib/types';
 
 const tutorial = `
 ## Stack — first principles
@@ -103,6 +103,186 @@ And since the call stack *is* a stack, any recursion can be rewritten iterativel
   },
 ];
 
+const implementations: Implementation[] = [
+  {
+    id: 'impl-stack',
+    title: 'Build a Stack',
+    statement: `A **stack** is the simplest container with a rule: **last in, first out (LIFO)**. You can only touch the top.
+
+Build a \`Stack\` class backed by a dynamic array (Python \`list\` / JS \`Array\`). Because adding and removing at the *end* of an array are both O(1), the array end *is* the top of the stack — that's the whole trick.
+
+Implement these methods:
+
+- \`push(x)\` — put \`x\` on top.
+- \`pop()\` — remove and return the top item; return \`None\`/\`null\` if empty.
+- \`peek()\` — return the top item without removing it; \`None\`/\`null\` if empty.
+- \`size()\` — how many items are in the stack.
+- \`is_empty()\` / \`isEmpty()\` — \`True\`/\`true\` when there are no items.
+
+Every operation should be O(1).`,
+    methods: [
+      { name: 'push', sig: 'push(x)', doc: 'Add x to the top.' },
+      { name: 'pop', sig: 'pop() -> item', doc: 'Remove and return the top (None/null if empty).' },
+      { name: 'peek', sig: 'peek() -> item', doc: 'Return the top without removing it (None/null if empty).' },
+      { name: 'size', sig: 'size() -> int', doc: 'Number of items.' },
+      { name: 'isEmpty', sig: 'is_empty() -> bool', doc: 'True when empty.' },
+    ],
+    className: { py: 'Stack', js: 'Stack' },
+    methodAliases: { py: { isEmpty: 'is_empty' } },
+    complexity: { time: 'O(1) per operation', space: 'O(n)' },
+    hints: [
+      'Store the items in a plain list/array. The end of the array is the top of the stack.',
+      'push = append to the end; pop = remove from the end. Both are O(1).',
+      'Guard pop/peek against an empty stack and return None/null instead of crashing.',
+    ],
+    starter: {
+      py: `class Stack:
+    def __init__(self):
+        # TODO: set up your internal storage
+        pass
+
+    def push(self, x):
+        # TODO: add x to the top
+        pass
+
+    def pop(self):
+        # TODO: remove and return the top item (None if empty)
+        pass
+
+    def peek(self):
+        # TODO: return the top item without removing it (None if empty)
+        pass
+
+    def size(self):
+        # TODO: how many items are in the stack?
+        pass
+
+    def is_empty(self):
+        # TODO: True if there are no items
+        pass
+`,
+      js: `class Stack {
+  constructor() {
+    // TODO: set up your internal storage
+  }
+
+  push(x) {
+    // TODO: add x to the top
+  }
+
+  pop() {
+    // TODO: remove and return the top item (null if empty)
+  }
+
+  peek() {
+    // TODO: return the top item without removing it (null if empty)
+  }
+
+  size() {
+    // TODO: how many items are in the stack?
+  }
+
+  isEmpty() {
+    // TODO: true if there are no items
+  }
+}
+`,
+    },
+    reference: {
+      py: `class Stack:
+    def __init__(self):
+        self._items = []
+
+    def push(self, x):
+        self._items.append(x)
+
+    def pop(self):
+        if not self._items:
+            return None
+        return self._items.pop()
+
+    def peek(self):
+        if not self._items:
+            return None
+        return self._items[-1]
+
+    def size(self):
+        return len(self._items)
+
+    def is_empty(self):
+        return len(self._items) == 0
+`,
+      js: `class Stack {
+  constructor() {
+    this._items = [];
+  }
+
+  push(x) {
+    this._items.push(x);
+  }
+
+  pop() {
+    return this._items.length ? this._items.pop() : null;
+  }
+
+  peek() {
+    return this._items.length ? this._items[this._items.length - 1] : null;
+  }
+
+  size() {
+    return this._items.length;
+  }
+
+  isEmpty() {
+    return this._items.length === 0;
+  }
+}
+`,
+    },
+    tests: [
+      {
+        name: 'LIFO order',
+        ops: [
+          { call: 'push', args: [1] },
+          { call: 'push', args: [2] },
+          { call: 'push', args: [3] },
+          { call: 'size', expect: 3 },
+          { call: 'pop', expect: 3 },
+          { call: 'pop', expect: 2 },
+          { call: 'peek', expect: 1 },
+          { call: 'size', expect: 1 },
+          { call: 'pop', expect: 1 },
+          { call: 'isEmpty', expect: true },
+        ],
+      },
+      {
+        name: 'empty behavior',
+        ops: [
+          { call: 'isEmpty', expect: true },
+          { call: 'pop', expect: null },
+          { call: 'peek', expect: null },
+          { call: 'size', expect: 0 },
+        ],
+      },
+      {
+        name: 'interleaved push/pop',
+        ops: [
+          { call: 'push', args: [5] },
+          { call: 'peek', expect: 5 },
+          { call: 'push', args: [10] },
+          { call: 'pop', expect: 10 },
+          { call: 'peek', expect: 5 },
+          { call: 'push', args: [7] },
+          { call: 'size', expect: 2 },
+          { call: 'pop', expect: 7 },
+          { call: 'pop', expect: 5 },
+          { call: 'isEmpty', expect: true },
+        ],
+      },
+    ],
+  },
+];
+
 const topic: Topic = {
   slug: 'stack',
   title: 'Stack',
@@ -111,6 +291,7 @@ const topic: Topic = {
   blurb: 'LIFO structure for matching/nesting and the monotonic-stack "next greater element" pattern.',
   tutorial,
   blocks,
+  implementations,
   problems: [
     {
       id: 'valid-parentheses',
