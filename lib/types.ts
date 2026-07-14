@@ -54,7 +54,7 @@ export interface Problem {
 }
 
 /** Top-level division of the curriculum. */
-export type Section = 'data-structure' | 'algorithm';
+export type Section = 'data-structure' | 'algorithm' | 'csprimer';
 
 /**
  * Family an algorithm topic belongs to (for grouping the Algorithms section).

@@ -3,18 +3,18 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { DATA_STRUCTURE_TOPICS, algorithmsByFamily, totalExercises } from '@/lib/curriculum';
+import { DATA_STRUCTURE_TOPICS, CSPRIMER_TOPICS, algorithmsByFamily, totalExercises } from '@/lib/curriculum';
 import type { Topic } from '@/lib/types';
 import { getSolved } from '@/lib/progress';
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const [solvedCount, setSolvedCount] = useState(0);
+  const [solved, setSolved] = useState<Set<string>>(new Set());
   const total = totalExercises();
   const families = algorithmsByFamily();
 
   useEffect(() => {
-    const update = () => setSolvedCount(getSolved().size);
+    const update = () => setSolved(getSolved());
     update();
     window.addEventListener('lootcode:progress', update);
     window.addEventListener('storage', update);
@@ -26,11 +26,13 @@ export default function Sidebar() {
 
   const link = (topic: Topic) => {
     const href = `/topics/${topic.slug}`;
-    const count = (topic.implementations?.length ?? 0) + topic.problems.length;
+    // Same definition as totalExercises(), so the per-topic counts sum to the total above.
+    const ids = [...(topic.implementations ?? []).map((i) => i.id), ...topic.problems.map((p) => p.id)];
+    const done = ids.filter((id) => solved.has(id)).length;
     return (
       <Link key={topic.slug} href={href} className={`nav-item ${pathname === href ? 'active' : ''}`}>
         <span>{topic.title}</span>
-        <span className="badge">{count}</span>
+        <span className={`badge ${done === ids.length ? 'badge-done' : ''}`}>{done}/{ids.length}</span>
       </Link>
     );
   };
@@ -41,7 +43,7 @@ export default function Sidebar() {
       <div className="tagline">DSA, from first principles — in your browser.</div>
 
       <div className="nav-section">Progress</div>
-      <span className="nav-item"><span>Exercises done</span><span className="badge">{solvedCount}/{total}</span></span>
+      <span className="nav-item"><span>Exercises done</span><span className="badge">{solved.size}/{total}</span></span>
 
       <div className="nav-section">Data Structures</div>
       {DATA_STRUCTURE_TOPICS.map(link)}
@@ -53,6 +55,9 @@ export default function Sidebar() {
           {topics.map(link)}
         </div>
       ))}
+
+      <div className="nav-section">CS Primer</div>
+      {CSPRIMER_TOPICS.map(link)}
     </aside>
   );
 }

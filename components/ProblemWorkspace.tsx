@@ -14,6 +14,8 @@ export default function ProblemWorkspace({ problem }: { problem: Problem }) {
   const [running, setRunning] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
   const [solved, setSolved] = useState(false);
+  /** Indices of cases whose details are open. Failures start open; any case can be toggled. */
+  const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   // Load draft (or starter) whenever the problem or language changes.
   useEffect(() => {
@@ -38,12 +40,21 @@ export default function ProblemWorkspace({ problem }: { problem: Problem }) {
     setResults(null);
   };
 
+  const toggleCase = (i: number) =>
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
+
   const run = async () => {
     setRunning(true);
     setResults(null);
     try {
       const r = await runProblem(problem, lang, code);
       setResults(r);
+      setExpanded(new Set(r.flatMap((c, i) => (c.passed ? [] : [i]))));
       if (r.length > 0 && r.every((c) => c.passed)) {
         markSolved(problem.id);
         setSolved(true);
@@ -142,11 +153,13 @@ export default function ProblemWorkspace({ problem }: { problem: Problem }) {
           )}
           {results?.map((c, i) => (
             <div key={i} className={`case ${c.passed ? 'pass' : 'fail'}`}>
-              <div className="case-head">
-                <span>{c.name}</span>
+              <button className="case-head" onClick={() => toggleCase(i)} aria-expanded={expanded.has(i)}>
+                <span>
+                  <span className="case-caret">{expanded.has(i) ? '▾' : '▸'}</span> {c.name}
+                </span>
                 <span>{c.passed ? '✓' : '✗'}</span>
-              </div>
-              {!c.passed && (
+              </button>
+              {expanded.has(i) && (
                 <div className="kv">
                   <b>input:</b> {JSON.stringify(c.input)}{'\n'}
                   {c.error ? (
@@ -155,6 +168,12 @@ export default function ProblemWorkspace({ problem }: { problem: Problem }) {
                     <>
                       <b>expected:</b> {JSON.stringify(c.expected)}{'\n'}
                       <b>got:</b> {JSON.stringify(c.actual)}
+                    </>
+                  )}
+                  {c.stdout && (
+                    <>
+                      {'\n'}<b>output:</b>{'\n'}
+                      <span className="case-stdout">{c.stdout}</span>
                     </>
                   )}
                 </div>

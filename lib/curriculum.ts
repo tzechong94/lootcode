@@ -19,6 +19,13 @@ import advancedGraphs from './content/advanced-graphs';
 import unionFind from './content/union-find';
 import mathBit from './content/math-bit';
 import sortingDivideConquer from './content/sorting-divide-conquer';
+import cspIntro from './content/csp-intro';
+import cspProblemSolving from './content/csp-problem-solving';
+import cspAsymptotics from './content/csp-asymptotics';
+import cspLinearStructures from './content/csp-linear-structures';
+import cspDivideConquer from './content/csp-divide-conquer';
+import cspGraphSearch from './content/csp-graph-search';
+import cspDynamicProgramming from './content/csp-dynamic-programming';
 
 // The curriculum manifest: built topics in study order.
 // Add a topic by importing its module and appending it here.
@@ -43,6 +50,13 @@ export const TOPICS: Topic[] = [
   unionFind,
   mathBit,
   sortingDivideConquer,
+  cspIntro,
+  cspProblemSolving,
+  cspAsymptotics,
+  cspLinearStructures,
+  cspDivideConquer,
+  cspGraphSearch,
+  cspDynamicProgramming,
 ].sort((a, b) => a.order - b.order);
 
 // ===== Section & family groupings =====
@@ -52,6 +66,9 @@ export const DATA_STRUCTURE_TOPICS: Topic[] = TOPICS.filter((t) => t.section ===
 
 /** Algorithm topics, in study order. */
 export const ALGORITHM_TOPICS: Topic[] = TOPICS.filter((t) => t.section === 'algorithm');
+
+/** CS Primer interview-fundamentals topics, in study order. */
+export const CSPRIMER_TOPICS: Topic[] = TOPICS.filter((t) => t.section === 'csprimer');
 
 /** Display order for algorithm families. */
 export const FAMILY_ORDER: AlgoFamily[] = [

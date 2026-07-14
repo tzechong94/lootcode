@@ -14,6 +14,8 @@ export default function ImplementWorkspace({ impl }: { impl: Implementation }) {
   const [running, setRunning] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
   const [solved, setSolved] = useState(false);
+  /** Indices of cases whose details are open. Failures start open; any case can be toggled. */
+  const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     const draft = loadDraft(impl.id, lang);
@@ -37,12 +39,21 @@ export default function ImplementWorkspace({ impl }: { impl: Implementation }) {
     setResults(null);
   };
 
+  const toggleCase = (i: number) =>
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
+
   const run = async () => {
     setRunning(true);
     setResults(null);
     try {
       const r = await runImplementation(impl, lang, code);
       setResults(r);
+      setExpanded(new Set(r.flatMap((c, i) => (c.passed ? [] : [i]))));
       if (r.length > 0 && r.every((c) => c.passed)) {
         markSolved(impl.id);
         setSolved(true);
@@ -135,12 +146,22 @@ export default function ImplementWorkspace({ impl }: { impl: Implementation }) {
           )}
           {results?.map((c, i) => (
             <div key={i} className={`case ${c.passed ? 'pass' : 'fail'}`}>
-              <div className="case-head">
-                <span>{c.name}</span>
+              <button className="case-head" onClick={() => toggleCase(i)} aria-expanded={expanded.has(i)}>
+                <span>
+                  <span className="case-caret">{expanded.has(i) ? '▾' : '▸'}</span> {c.name}
+                </span>
                 <span>{c.passed ? '✓' : '✗'}</span>
-              </div>
-              {!c.passed && c.detail && (
-                <div className="kv">{c.detail}</div>
+              </button>
+              {expanded.has(i) && (
+                <div className="kv">
+                  {c.detail ?? 'All ops passed.'}
+                  {c.stdout && (
+                    <>
+                      {'\n'}<b>output:</b>{'\n'}
+                      <span className="case-stdout">{c.stdout}</span>
+                    </>
+                  )}
+                </div>
               )}
             </div>
           ))}

@@ -81,6 +81,7 @@ pre code { background: none; padding: 0; }
 .sidebar a.nav-item.active { background: var(--accent-dim); color: #fff; }
 .sidebar span.nav-item.soon { color: var(--text-dim); cursor: default; }
 .sidebar .badge { font-size: 11px; color: var(--text-dim); }
+.sidebar .badge-done { color: var(--green); }
 
 .main { flex: 1; min-width: 0; padding: 32px 40px; max-width: 1400px; }
 
@@ -170,7 +171,10 @@ details.disclosure summary { cursor: pointer; color: var(--accent); font-size: 1
 .case { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; background: var(--bg-elev); font-size: 13px; }
 .case.pass { border-left: 3px solid var(--green); }
 .case.fail { border-left: 3px solid var(--red); }
-.case .case-head { display: flex; justify-content: space-between; }
+.case .case-head { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0; background: none; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.case .case-head:hover { color: var(--text); }
+.case .case-caret { color: var(--text-dim); display: inline-block; width: 10px; }
+.case .case-stdout { color: var(--text); }
 .case .kv { font-family: var(--mono); font-size: 12px; color: var(--text-dim); margin-top: 4px; white-space: pre-wrap; word-break: break-word; }
 .case .kv b { color: var(--text); }
 .note { color: var(--text-dim); font-size: 13px; }

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { DATA_STRUCTURE_TOPICS, algorithmsByFamily } from '@/lib/curriculum';
+import { DATA_STRUCTURE_TOPICS, CSPRIMER_TOPICS, algorithmsByFamily } from '@/lib/curriculum';
 import type { Topic } from '@/lib/types';
 
 function TopicCard({ topic }: { topic: Topic }) {
@@ -58,6 +58,18 @@ export default function Home() {
             </div>
           </div>
         ))}
+      </section>
+
+      <section className="section-block">
+        <div className="section-head">
+          <h2>CS Primer</h2>
+          <p>Interview fundamentals from csprimer.com&apos;s Introduction &amp; Algorithms courses — write Python or JavaScript and run it against real tests.</p>
+        </div>
+        <div className="roadmap-grid">
+          {CSPRIMER_TOPICS.map((topic) => (
+            <TopicCard key={topic.slug} topic={topic} />
+          ))}
+        </div>
       </section>
     </div>
   );
