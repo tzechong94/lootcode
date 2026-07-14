@@ -69,6 +69,40 @@ Equivalently: the maximum sum of a subset of the array with no two chosen elemen
 }
 `,
       },
+      referenceLabel: 'Iterative',
+      alternates: [
+        {
+          label: 'Recursive (memoized)',
+          code: {
+            py: `def rob(nums):
+    memo = {}
+
+    def best(i):
+        if i >= len(nums):
+            return 0
+        if i in memo:
+            return memo[i]
+        # Skip house i, or rob it and jump past its neighbour to i + 2.
+        memo[i] = max(best(i + 1), nums[i] + best(i + 2))
+        return memo[i]
+
+    return best(0)
+`,
+            js: `function rob(nums) {
+  const memo = new Map();
+  const best = (i) => {
+    if (i >= nums.length) return 0;
+    if (memo.has(i)) return memo.get(i);
+    // Skip house i, or rob it and jump past its neighbour to i + 2.
+    memo.set(i, Math.max(best(i + 1), nums[i] + best(i + 2)));
+    return memo.get(i);
+  };
+  return best(0);
+}
+`,
+          },
+        },
+      ],
       tests: [
         { input: [[1, 2, 3, 1]], expected: 4 },
         { input: [[2, 7, 9, 3, 1]], expected: 12 },
@@ -77,7 +111,7 @@ Equivalently: the maximum sum of a subset of the array with no two chosen elemen
         { input: [[2, 1, 1, 2]], expected: 4 },
         { input: [[10, 5, 5, 10]], expected: 20 },
         { input: [[2, 1]], expected: 2 },
-        // All zeros — distinguishes "0 because empty" from "0 because worthless".
+        // All zeros: distinguishes "0 because empty" from "0 because worthless".
         { input: [[0, 0, 0, 0]], expected: 0 },
         // Odd-length all-equal: taking both ends gives 10, taking the odd index gives 5.
         { input: [[5, 5, 5]], expected: 10 },
@@ -130,6 +164,49 @@ For example \`12 = 4 + 4 + 4\` (three) and \`13 = 4 + 9\` (two). Let \`dp[k]\` b
 }
 `,
       },
+      referenceLabel: 'Iterative (bottom-up)',
+      alternates: [
+        {
+          label: 'Recursive (memoized)',
+          code: {
+            py: `def num_squares(n, memo=None):
+    if memo is None:
+        memo = {}
+    if n == 0:
+        return 0
+    if n in memo:
+        return memo[n]
+    squares = []
+    j = 1
+    while j * j <= n:
+        squares.append(j * j)
+        j += 1
+    # Try the largest square first. That fills the memo from the bottom up, so the
+    # j = 1 branch finds n - 1 already solved instead of recursing n frames deep.
+    best = n
+    for s in reversed(squares):
+        best = min(best, num_squares(n - s, memo) + 1)
+    memo[n] = best
+    return best
+`,
+            js: `function numSquares(n, memo = new Map()) {
+  if (n === 0) return 0;
+  if (memo.has(n)) return memo.get(n);
+  const squares = [];
+  for (let j = 1; j * j <= n; j++) squares.push(j * j);
+  // Try the largest square first. That fills the memo from the bottom up, so the
+  // j = 1 branch finds n - 1 already solved instead of recursing n frames deep.
+  let best = n;
+  for (let k = squares.length - 1; k >= 0; k--) {
+    best = Math.min(best, numSquares(n - squares[k], memo) + 1);
+  }
+  memo.set(n, best);
+  return best;
+}
+`,
+          },
+        },
+      ],
       tests: [
         { input: [1], expected: 1 },
         { input: [4], expected: 1 },
@@ -144,7 +221,7 @@ For example \`12 = 4 + 4 + 4\` (three) and \`13 = 4 + 9\` (two). Let \`dp[k]\` b
         // covers a=0.
         { input: [28], expected: 4 },
         { input: [9999], expected: 4 },
-        // Upper bound, and a perfect square — answer 1.
+        // Upper bound, and a perfect square, so the answer is 1.
         { input: [10000], expected: 1 },
       ],
       hints: [
@@ -205,13 +282,62 @@ Return that minimum sum. The state \`dp[i][j]\` is the cheapest way to reach cel
 }
 `,
       },
+      referenceLabel: 'Iterative (bottom-up)',
+      alternates: [
+        {
+          label: 'Recursive (memoized)',
+          code: {
+            py: `def min_path_sum(grid):
+    rows = len(grid)
+    cols = len(grid[0])
+    memo = {}
+
+    def best(i, j):
+        # Cheapest way to reach (i, j) from the top-left.
+        if i == 0 and j == 0:
+            return grid[0][0]
+        if (i, j) in memo:
+            return memo[(i, j)]
+        if i == 0:
+            came_from = best(i, j - 1)
+        elif j == 0:
+            came_from = best(i - 1, j)
+        else:
+            came_from = min(best(i - 1, j), best(i, j - 1))
+        memo[(i, j)] = grid[i][j] + came_from
+        return memo[(i, j)]
+
+    return best(rows - 1, cols - 1)
+`,
+            js: `function minPathSum(grid) {
+  const rows = grid.length;
+  const cols = grid[0].length;
+  const memo = new Map();
+  // Cheapest way to reach (i, j) from the top-left.
+  const best = (i, j) => {
+    if (i === 0 && j === 0) return grid[0][0];
+    const key = i + ',' + j;
+    if (memo.has(key)) return memo.get(key);
+    let cameFrom;
+    if (i === 0) cameFrom = best(i, j - 1);
+    else if (j === 0) cameFrom = best(i - 1, j);
+    else cameFrom = Math.min(best(i - 1, j), best(i, j - 1));
+    memo.set(key, grid[i][j] + cameFrom);
+    return memo.get(key);
+  };
+  return best(rows - 1, cols - 1);
+}
+`,
+          },
+        },
+      ],
       tests: [
         { input: [[[1, 3, 1], [1, 5, 1], [4, 2, 1]]], expected: 7 },
         { input: [[[1, 2, 3], [4, 5, 6]]], expected: 12 },
         { input: [[[5]]], expected: 5 },
         { input: [[[1, 2], [1, 1]]], expected: 3 },
         { input: [[[1, 2, 5], [3, 2, 1]]], expected: 6 },
-        // 1xN and Nx1 — no existing case is single-row or single-column, so the
+        // 1xN and Nx1: no existing case is single-row or single-column, so the
         // "first row: only-right" and "first column: only-down" branches are never
         // exercised on their own.
         { input: [[[1, 2, 3, 4]]], expected: 10 },
@@ -280,6 +406,51 @@ Let \`dp[i][j]\` be the distance between the first \`i\` characters of \`a\` and
 }
 `,
       },
+      referenceLabel: 'Iterative (bottom-up)',
+      alternates: [
+        {
+          label: 'Recursive (memoized)',
+          code: {
+            py: `def edit_distance(a, b):
+    memo = {}
+
+    def best(i, j):
+        # Distance between the first i chars of a and the first j of b.
+        if i == 0:
+            return j
+        if j == 0:
+            return i
+        if (i, j) in memo:
+            return memo[(i, j)]
+        if a[i - 1] == b[j - 1]:
+            memo[(i, j)] = best(i - 1, j - 1)
+        else:
+            memo[(i, j)] = 1 + min(best(i - 1, j), best(i, j - 1), best(i - 1, j - 1))
+        return memo[(i, j)]
+
+    return best(len(a), len(b))
+`,
+            js: `function editDistance(a, b) {
+  const memo = new Map();
+  // Distance between the first i chars of a and the first j of b.
+  const best = (i, j) => {
+    if (i === 0) return j;
+    if (j === 0) return i;
+    const key = i + ',' + j;
+    if (memo.has(key)) return memo.get(key);
+    if (a[i - 1] === b[j - 1]) {
+      memo.set(key, best(i - 1, j - 1));
+    } else {
+      memo.set(key, 1 + Math.min(best(i - 1, j), best(i, j - 1), best(i - 1, j - 1)));
+    }
+    return memo.get(key);
+  };
+  return best(a.length, b.length);
+}
+`,
+          },
+        },
+      ],
       tests: [
         { input: ['horse', 'ros'], expected: 3 },
         { input: ['intention', 'execution'], expected: 5 },
@@ -287,7 +458,7 @@ Let \`dp[i][j]\` be the distance between the first \`i\` characters of \`a\` and
         { input: ['abc', 'abc'], expected: 0 },
         { input: ['sunday', 'saturday'], expected: 3 },
         { input: ['abc', ''], expected: 3 },
-        // Both empty — the dp[0][0] base case; only the one-sided-empty cases were covered.
+        // Both empty: the dp[0][0] base case. Only the one-sided-empty cases were covered.
         { input: ['', ''], expected: 0 },
         // Pins this to Levenshtein: a transposition is two edits here, not one. A
         // Damerau-Levenshtein solution returns 1 and is caught only by this case.

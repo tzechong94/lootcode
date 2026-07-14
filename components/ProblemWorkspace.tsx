@@ -121,8 +121,23 @@ export default function ProblemWorkspace({ problem }: { problem: Problem }) {
         )}
 
         <details className="disclosure" open={showSolution} onToggle={(e) => setShowSolution((e.target as HTMLDetailsElement).open)}>
-          <summary>Show reference solution ({lang === 'py' ? 'Python' : 'JavaScript'})</summary>
-          <pre><code>{problem.reference[lang]}</code></pre>
+          <summary>
+            Show reference solution{problem.alternates?.length ? 's' : ''} ({lang === 'py' ? 'Python' : 'JavaScript'})
+          </summary>
+          {problem.alternates?.length ? (
+            <>
+              <div className="ref-label">{problem.referenceLabel ?? 'Reference'}</div>
+              <pre><code>{problem.reference[lang]}</code></pre>
+              {problem.alternates.map((alt) => (
+                <div key={alt.label}>
+                  <div className="ref-label">{alt.label}</div>
+                  <pre><code>{alt.code[lang]}</code></pre>
+                </div>
+              ))}
+            </>
+          ) : (
+            <pre><code>{problem.reference[lang]}</code></pre>
+          )}
         </details>
       </div>
 

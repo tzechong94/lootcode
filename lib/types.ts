@@ -26,6 +26,13 @@ export interface Example {
   explanation?: string;
 }
 
+/** A labelled alternative reference solution (see `Problem.alternates`). */
+export interface AltReference {
+  /** Short name for the approach, e.g. 'Recursive (memoized)'. */
+  label: string;
+  code: Record<Lang, string>;
+}
+
 export interface Problem {
   id: string;
   title: string;
@@ -47,6 +54,17 @@ export interface Problem {
   starter: Record<Lang, string>;
   /** Reference solution that MUST pass `tests`, per language. */
   reference: Record<Lang, string>;
+  /**
+   * Names the primary `reference` when `alternates` are present (e.g. 'Iterative').
+   * Ignored when there are no alternates.
+   */
+  referenceLabel?: string;
+  /**
+   * Further reference solutions taking a different approach to the same problem, e.g.
+   * the recursive counterpart to an iterative primary. Each one must also pass `tests`
+   * in both languages: `npm run verify` checks them exactly like `reference`.
+   */
+  alternates?: AltReference[];
   tests: TestCase[];
   compare?: CompareMode;
   hints?: string[];

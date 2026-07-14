@@ -224,6 +224,16 @@ const topic: Topic = {
         py: 'def invert_tree(values):\n    root = build_tree(values)\n    def dfs(node):\n        if not node:\n            return\n        node.left, node.right = node.right, node.left\n        dfs(node.left)\n        dfs(node.right)\n    dfs(root)\n    return to_level_order(root)\n',
         js: 'function invertTree(values) {\n  const root = buildTree(values);\n  function dfs(node) {\n    if (!node) return;\n    const tmp = node.left;\n    node.left = node.right;\n    node.right = tmp;\n    dfs(node.left);\n    dfs(node.right);\n  }\n  dfs(root);\n  return toLevelOrder(root);\n}\n',
       },
+      referenceLabel: 'Recursive',
+      alternates: [
+        {
+          label: 'Iterative (explicit stack)',
+          code: {
+            py: 'def invert_tree(values):\n    root = build_tree(values)\n    stack = [root]\n    while stack:\n        node = stack.pop()\n        if not node:\n            continue\n        node.left, node.right = node.right, node.left\n        stack.append(node.left)\n        stack.append(node.right)\n    return to_level_order(root)\n',
+            js: 'function invertTree(values) {\n  const root = buildTree(values);\n  const stack = [root];\n  while (stack.length) {\n    const node = stack.pop();\n    if (!node) continue;\n    const tmp = node.left;\n    node.left = node.right;\n    node.right = tmp;\n    stack.push(node.left);\n    stack.push(node.right);\n  }\n  return toLevelOrder(root);\n}\n',
+          },
+        },
+      ],
       tests: [
         { input: [[4, 2, 7, 1, 3, 6, 9]], expected: [4, 7, 2, 9, 6, 3, 1] },
         { input: [[2, 1, 3]], expected: [2, 3, 1] },
@@ -260,6 +270,16 @@ const topic: Topic = {
         py: 'def max_depth(values):\n    root = build_tree(values)\n    def depth(node):\n        if not node:\n            return 0\n        return 1 + max(depth(node.left), depth(node.right))\n    return depth(root)\n',
         js: 'function maxDepth(values) {\n  const root = buildTree(values);\n  function depth(node) {\n    if (!node) return 0;\n    return 1 + Math.max(depth(node.left), depth(node.right));\n  }\n  return depth(root);\n}\n',
       },
+      referenceLabel: 'Recursive',
+      alternates: [
+        {
+          label: 'Iterative (BFS level count)',
+          code: {
+            py: 'def max_depth(values):\n    root = build_tree(values)\n    if not root:\n        return 0\n    from collections import deque\n    q = deque([root])\n    depth = 0\n    while q:\n        for _ in range(len(q)):\n            node = q.popleft()\n            if node.left:\n                q.append(node.left)\n            if node.right:\n                q.append(node.right)\n        depth += 1\n    return depth\n',
+            js: 'function maxDepth(values) {\n  const root = buildTree(values);\n  if (!root) return 0;\n  let level = [root];\n  let depth = 0;\n  while (level.length) {\n    const next = [];\n    for (const n of level) {\n      if (n.left) next.push(n.left);\n      if (n.right) next.push(n.right);\n    }\n    level = next;\n    depth += 1;\n  }\n  return depth;\n}\n',
+          },
+        },
+      ],
       tests: [
         { input: [[3, 9, 20, null, null, 15, 7]], expected: 3 },
         { input: [[]], expected: 0 },
@@ -296,6 +316,16 @@ const topic: Topic = {
         py: 'def level_order(values):\n    root = build_tree(values)\n    if not root:\n        return []\n    from collections import deque\n    res = []\n    q = deque([root])\n    while q:\n        level = []\n        for _ in range(len(q)):\n            node = q.popleft()\n            level.append(node.val)\n            if node.left:\n                q.append(node.left)\n            if node.right:\n                q.append(node.right)\n        res.append(level)\n    return res\n',
         js: 'function levelOrder(values) {\n  const root = buildTree(values);\n  if (!root) return [];\n  const res = [];\n  let level = [root];\n  while (level.length) {\n    res.push(level.map((n) => n.val));\n    const next = [];\n    for (const n of level) {\n      if (n.left) next.push(n.left);\n      if (n.right) next.push(n.right);\n    }\n    level = next;\n  }\n  return res;\n}\n',
       },
+      referenceLabel: 'Iterative (BFS)',
+      alternates: [
+        {
+          label: 'Recursive (DFS carrying depth)',
+          code: {
+            py: 'def level_order(values):\n    root = build_tree(values)\n    res = []\n    def dfs(node, depth):\n        if not node:\n            return\n        # First node to reach this depth opens the level.\n        if depth == len(res):\n            res.append([])\n        res[depth].append(node.val)\n        dfs(node.left, depth + 1)\n        dfs(node.right, depth + 1)\n    dfs(root, 0)\n    return res\n',
+            js: 'function levelOrder(values) {\n  const root = buildTree(values);\n  const res = [];\n  function dfs(node, depth) {\n    if (!node) return;\n    // First node to reach this depth opens the level.\n    if (depth === res.length) res.push([]);\n    res[depth].push(node.val);\n    dfs(node.left, depth + 1);\n    dfs(node.right, depth + 1);\n  }\n  dfs(root, 0);\n  return res;\n}\n',
+          },
+        },
+      ],
       tests: [
         { input: [[3, 9, 20, null, null, 15, 7]], expected: [[3], [9, 20], [15, 7]] },
         { input: [[]], expected: [] },

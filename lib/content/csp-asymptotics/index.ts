@@ -126,7 +126,7 @@ The O(n) solution is a simple loop. But the hint "you can do better" points at O
         { input: [6], expected: 8 },
         { input: [1], expected: 0 },
         { input: [1000], expected: 233168 },
-        // n = 0: (n-1)//k goes negative — the series must still come out at 0, not negative.
+        // n = 0: (n-1)//k goes negative, and the series must still come out at 0.
         { input: [0], expected: 0 },
         { input: [5], expected: 3 },
         // 15 itself is excluded ("strictly below"), but 3/5/6/9/10/12 count.

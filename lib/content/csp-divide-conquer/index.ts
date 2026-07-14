@@ -86,6 +86,65 @@ Split the array in half, sort each half recursively, then **merge** the two sort
 }
 `,
       },
+      referenceLabel: 'Recursive',
+      alternates: [
+        {
+          label: 'Iterative (bottom-up)',
+          code: {
+            py: `def merge_sort(nums):
+    result = list(nums)
+    buf = [0] * len(result)
+    width = 1
+    # Merge already-sorted runs of \`width\`, doubling the run length each pass.
+    while width < len(result):
+        for lo in range(0, len(result), 2 * width):
+            mid = min(lo + width, len(result))
+            hi = min(lo + 2 * width, len(result))
+            i, j, k = lo, mid, lo
+            while i < mid and j < hi:
+                if result[i] <= result[j]:
+                    buf[k] = result[i]
+                    i += 1
+                else:
+                    buf[k] = result[j]
+                    j += 1
+                k += 1
+            while i < mid:
+                buf[k] = result[i]
+                i += 1
+                k += 1
+            while j < hi:
+                buf[k] = result[j]
+                j += 1
+                k += 1
+        result, buf = buf, result
+        width *= 2
+    return result
+`,
+            js: `function mergeSort(nums) {
+  let result = nums.slice();
+  let buf = new Array(result.length);
+  // Merge already-sorted runs of \`width\`, doubling the run length each pass.
+  for (let width = 1; width < result.length; width *= 2) {
+    for (let lo = 0; lo < result.length; lo += 2 * width) {
+      const mid = Math.min(lo + width, result.length);
+      const hi = Math.min(lo + 2 * width, result.length);
+      let i = lo, j = mid, k = lo;
+      while (i < mid && j < hi) {
+        if (result[i] <= result[j]) buf[k++] = result[i++];
+        else buf[k++] = result[j++];
+      }
+      while (i < mid) buf[k++] = result[i++];
+      while (j < hi) buf[k++] = result[j++];
+    }
+    [result, buf] = [buf, result];
+  }
+  return result;
+}
+`,
+          },
+        },
+      ],
       tests: [
         { input: [[5, 2, 4, 1, 3]], expected: [1, 2, 3, 4, 5] },
         { input: [[3, 1, 2]], expected: [1, 2, 3] },
@@ -95,7 +154,7 @@ Split the array in half, sort each half recursively, then **merge** the two sort
         { input: [[-3, 5, 0, -1, 5]], expected: [-3, -1, 0, 5, 5] },
         { input: [[9, 8, 7, 6, 5, 4, 3, 2, 1]], expected: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
         { input: [[2, 1]], expected: [1, 2] },
-        // Already sorted — the right half never drains early.
+        // Already sorted: the right half never drains early.
         { input: [[1, 2, 3, 4, 5]], expected: [1, 2, 3, 4, 5] },
         // Even-length reverse; the existing reverse case is odd-length only.
         { input: [[4, 3, 2, 1]], expected: [1, 2, 3, 4] },
@@ -153,6 +212,29 @@ The naive loop multiplies \`exp\` times. Divide and conquer instead: \`x^n = (x^
 }
 `,
       },
+      referenceLabel: 'Iterative',
+      alternates: [
+        {
+          label: 'Recursive',
+          code: {
+            py: `def power(base, exp):
+    if exp == 0:
+        return 1
+    half = power(base, exp // 2)
+    if exp % 2 == 0:
+        return half * half
+    return half * half * base
+`,
+            js: `function power(base, exp) {
+  if (exp === 0) return 1;
+  const half = power(base, Math.floor(exp / 2));
+  if (exp % 2 === 0) return half * half;
+  return half * half * base;
+}
+`,
+          },
+        },
+      ],
       tests: [
         { input: [2, 10], expected: 1024 },
         { input: [3, 0], expected: 1 },
@@ -217,6 +299,61 @@ Pick a **pivot**, **partition** so that everything smaller goes to its left and 
 }
 `,
       },
+      referenceLabel: 'Recursive',
+      alternates: [
+        {
+          label: 'Iterative (explicit stack)',
+          code: {
+            py: `def quicksort(nums):
+    result = list(nums)
+    # The stack holds the ranges still to sort, replacing the recursive calls.
+    stack = [(0, len(result) - 1)]
+    while stack:
+        lo, hi = stack.pop()
+        if lo >= hi:
+            continue
+        pivot = result[(lo + hi) // 2]
+        i, j = lo, hi
+        while i <= j:
+            while result[i] < pivot:
+                i += 1
+            while result[j] > pivot:
+                j -= 1
+            if i <= j:
+                result[i], result[j] = result[j], result[i]
+                i += 1
+                j -= 1
+        stack.append((lo, j))
+        stack.append((i, hi))
+    return result
+`,
+            js: `function quicksort(nums) {
+  const result = nums.slice();
+  // The stack holds the ranges still to sort, replacing the recursive calls.
+  const stack = [[0, result.length - 1]];
+  while (stack.length > 0) {
+    const [lo, hi] = stack.pop();
+    if (lo >= hi) continue;
+    const pivot = result[Math.floor((lo + hi) / 2)];
+    let i = lo, j = hi;
+    while (i <= j) {
+      while (result[i] < pivot) i++;
+      while (result[j] > pivot) j--;
+      if (i <= j) {
+        [result[i], result[j]] = [result[j], result[i]];
+        i++;
+        j--;
+      }
+    }
+    stack.push([lo, j]);
+    stack.push([i, hi]);
+  }
+  return result;
+}
+`,
+          },
+        },
+      ],
       tests: [
         { input: [[5, 2, 4, 1, 3]], expected: [1, 2, 3, 4, 5] },
         { input: [[2, 2, 1]], expected: [1, 2, 2] },

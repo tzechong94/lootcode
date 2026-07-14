@@ -16,8 +16,8 @@ export interface RunCaseResult {
 
 type RawResult = { ok: boolean; value?: unknown; error?: string; stdout?: string };
 
-// Printing inside a loop is a common debugging move, so cap what we keep —
-// an unbounded buffer would be shipped across postMessage and rendered as-is.
+// Printing inside a loop is a common debugging move, so cap what we keep: an
+// unbounded buffer would be shipped across postMessage and rendered as-is.
 const MAX_OUT_LINES = 200;
 const MAX_OUT_CHARS = 10000;
 const TRUNC_NOTE = '… output truncated';
@@ -216,7 +216,7 @@ function bootPyWorker(): Promise<PyWorkerHandle> {
 }
 
 /**
- * Kill the worker outright — the only way to stop Python code that won't yield.
+ * Kill the worker outright: the only way to stop Python code that will not yield.
  * Any other in-flight job dies with it, so settle them all rather than let them hang.
  */
 function killPyWorker(handle: PyWorkerHandle, reason: string): void {
@@ -232,7 +232,7 @@ type PyRun = { ok: true; result: string } | { ok: false; error: string };
 
 /**
  * Run one Python harness to completion, or kill the worker if it exceeds the time limit.
- * Pyodide's load time is deliberately excluded from the limit — only execution is raced.
+ * Pyodide's load time is deliberately excluded from the limit: only execution is raced.
  */
 async function runPyHarness(code: string, globalName: string, globalValue: string): Promise<PyRun> {
   let handle: PyWorkerHandle;

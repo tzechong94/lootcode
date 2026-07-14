@@ -85,7 +85,7 @@ Return the tree as a nested pair \`[pid, [child-subtrees…]]\`, where each node
         // (lexicographic by default) would order 10 before 2 and still pass them all.
         { input: [[[1, 0], [10, 1], [2, 1], [9, 1]], 1], expected: [1, [[2, []], [9, []], [10, []]]] },
         { input: [[[100, 0], [20, 100], [3, 100], [9, 20], [11, 20]], 100], expected: [100, [[3, []], [20, [[9, []], [11, []]]]]] },
-        // Degenerate linear chain — depth without branching.
+        // Degenerate linear chain: depth without branching.
         { input: [[[1, 0], [2, 1], [3, 2], [4, 3], [5, 4]], 1], expected: [1, [[2, [[3, [[4, [[5, []]]]]]]]]] },
         // Flat star whose root pid exceeds every child.
         { input: [[[5, 0], [1, 5], [2, 5], [3, 5], [4, 5]], 5], expected: [5, [[1, []], [2, []], [3, []], [4, []]]] },
@@ -169,10 +169,10 @@ def ladder_length(begin, end, words):
         { input: ['red', 'tax', ['ted', 'tex', 'red', 'tax', 'tad', 'den', 'rex', 'pee']], expected: 4 },
         // begin == end: the ladder is just [begin].
         { input: ['hit', 'hit', ['hit']], expected: 1 },
-        // end IS in words but unreachable — reaches the "BFS exhausted" return. The existing
+        // end IS in words but unreachable, so this reaches the "BFS exhausted" return. The existing
         // 0-case only exercises the `end not in words` early return.
         { input: ['hit', 'cog', ['hot', 'cog']], expected: 0 },
-        // Cycle plus a disconnected goal — loops forever without a visited set.
+        // Cycle plus a disconnected goal: loops forever without a visited set.
         { input: ['aaa', 'ccc', ['aab', 'abb', 'bbb', 'baa', 'aaa', 'ccc']], expected: 0 },
         { input: ['aa', 'bb', ['ab', 'bb']], expected: 3 },
       ],
@@ -268,9 +268,9 @@ def min_pours(a, b, target):
         { input: [3, 5, 0], expected: 0 },
         { input: [2, 3, 1], expected: 2 },
         // target == a + b. The classic LeetCode version accepts the jugs' *combined* contents,
-        // but this statement says "in either jug" — so 8 is unreachable.
+        // but this statement says "in either jug", so 8 is unreachable.
         { input: [3, 5, 8], expected: -1 },
-        // target above both capacities — the existing -1 case has target ≤ b, so it only
+        // target above both capacities. The existing -1 case has target ≤ b, so it only
         // probes the gcd reason for failure, never the out-of-range one.
         { input: [3, 5, 9], expected: -1 },
         // Equal capacities, untested until now: reachable in one op, vs unreachable by gcd.
@@ -383,7 +383,7 @@ function hasTour(n) {
         { input: [4], expected: false },
         { input: [5], expected: true },
         { input: [6], expected: true },
-        // The only board size in 1 ≤ n ≤ 6 left untested — and the one that fails because the
+        // The only board size in 1 ≤ n ≤ 6 left untested, and the one that fails because the
         // knight has no legal move at all, rather than because the search exhausts.
         { input: [2], expected: false },
       ],
@@ -495,7 +495,7 @@ def min_cost(grid):
         // costing 7, while detouring along the field row is 5 steps costing 5. A BFS that
         // counts hops passes every other case here and fails this one.
         { input: [['O..X', '    ']], expected: 5 },
-        // Nx1 — every other case is 1xN, so this is the cheap catch for a row/col transposition.
+        // Nx1: every other case is 1xN, so this is the cheap catch for a row/col transposition.
         { input: [['O', '#', 'X']], expected: 11 },
         { input: [['O#', '#X']], expected: 11 },
         // 'X' comes before 'O' in scan order.

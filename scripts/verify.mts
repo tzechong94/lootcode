@@ -70,26 +70,37 @@ function withPreamble(preamble: string | undefined, code: string): string {
   return preamble ? `${preamble}\n${code}` : code;
 }
 
-function checkLang(problem: Problem, lang: 'js' | 'py'): string[] {
+/** Run one solution (the primary reference or an alternate) against every test. */
+function checkSolution(problem: Problem, lang: 'js' | 'py', code: string, which: string): string[] {
   const failures: string[] = [];
   const results =
     lang === 'js'
-      ? runJs(withPreamble(problem.preamble?.js, problem.reference.js), problem.functionName.js, problem.tests)
-      : runPy(withPreamble(problem.preamble?.py, problem.reference.py), problem.functionName.py, problem.tests);
+      ? runJs(withPreamble(problem.preamble?.js, code), problem.functionName.js, problem.tests)
+      : runPy(withPreamble(problem.preamble?.py, code), problem.functionName.py, problem.tests);
 
   problem.tests.forEach((tc, i) => {
     const r = results[i];
     const label = tc.name ?? `case ${i + 1}`;
     if (!r || !r.ok) {
-      failures.push(`[${lang}] ${label}: ${r?.error ?? 'no result'}`);
+      failures.push(`[${lang}/${which}] ${label}: ${r?.error ?? 'no result'}`);
       return;
     }
     if (!resultsEqual(r.value, tc.expected, problem.compare)) {
       failures.push(
-        `[${lang}] ${label}: got ${JSON.stringify(r.value)}, expected ${JSON.stringify(tc.expected)}`,
+        `[${lang}/${which}] ${label}: got ${JSON.stringify(r.value)}, expected ${JSON.stringify(tc.expected)}`,
       );
     }
   });
+  return failures;
+}
+
+/** Every alternate must hold the same contract as the primary, so check them all. */
+function checkLang(problem: Problem, lang: 'js' | 'py'): string[] {
+  const primary = problem.referenceLabel ?? 'reference';
+  const failures = checkSolution(problem, lang, problem.reference[lang], primary);
+  for (const alt of problem.alternates ?? []) {
+    failures.push(...checkSolution(problem, lang, alt.code[lang], alt.label));
+  }
   return failures;
 }
 
@@ -249,9 +260,12 @@ function main(): void {
       total += 1;
       const failures = [...checkLang(problem, 'js'), ...checkLang(problem, 'py')];
       const n = problem.tests.length;
+      // Every solution is run against every test, so say how many were checked.
+      const variants = 1 + (problem.alternates?.length ?? 0);
+      const suffix = variants > 1 ? `, ${variants} solutions` : '';
       if (failures.length === 0) {
         passed += 1;
-        console.log(`  ✓ ${topic.slug}/${problem.id}  (js ${n}/${n}, py ${n}/${n})`);
+        console.log(`  ✓ ${topic.slug}/${problem.id}  (js ${n}/${n}, py ${n}/${n}${suffix})`);
       } else {
         console.log(`  ✗ ${topic.slug}/${problem.id}`);
         for (const f of failures) console.log(`      ${f}`);

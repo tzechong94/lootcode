@@ -117,6 +117,16 @@ const topic: Topic = {
         py: 'def climb_stairs(n):\n    if n <= 2:\n        return n\n    prev, cur = 1, 2\n    for _ in range(3, n + 1):\n        prev, cur = cur, prev + cur\n    return cur\n',
         js: 'function climbStairs(n) {\n  if (n <= 2) return n;\n  let prev = 1, cur = 2;\n  for (let i = 3; i <= n; i++) {\n    const next = prev + cur;\n    prev = cur;\n    cur = next;\n  }\n  return cur;\n}\n',
       },
+      referenceLabel: 'Iterative',
+      alternates: [
+        {
+          label: 'Recursive (memoized)',
+          code: {
+            py: 'def climb_stairs(n, memo=None):\n    if memo is None:\n        memo = {}\n    if n <= 2:\n        return n\n    if n in memo:\n        return memo[n]\n    # Reach step n from n-1 (a 1-step) or n-2 (a 2-step).\n    memo[n] = climb_stairs(n - 1, memo) + climb_stairs(n - 2, memo)\n    return memo[n]\n',
+            js: 'function climbStairs(n, memo = new Map()) {\n  if (n <= 2) return n;\n  if (memo.has(n)) return memo.get(n);\n  // Reach step n from n-1 (a 1-step) or n-2 (a 2-step).\n  memo.set(n, climbStairs(n - 1, memo) + climbStairs(n - 2, memo));\n  return memo.get(n);\n}\n',
+          },
+        },
+      ],
       tests: [
         { input: [2], expected: 2 },
         { input: [3], expected: 3 },
@@ -151,6 +161,16 @@ const topic: Topic = {
         py: 'def rob(nums):\n    prev, cur = 0, 0\n    for x in nums:\n        prev, cur = cur, max(cur, prev + x)\n    return cur\n',
         js: 'function rob(nums) {\n  let prev = 0, cur = 0;\n  for (const x of nums) {\n    const next = Math.max(cur, prev + x);\n    prev = cur;\n    cur = next;\n  }\n  return cur;\n}\n',
       },
+      referenceLabel: 'Iterative',
+      alternates: [
+        {
+          label: 'Recursive (memoized)',
+          code: {
+            py: 'def rob(nums, i=0, memo=None):\n    if memo is None:\n        memo = {}\n    if i >= len(nums):\n        return 0\n    if i in memo:\n        return memo[i]\n    # At house i: skip it, or rob it plus the best from two houses on.\n    memo[i] = max(rob(nums, i + 1, memo), nums[i] + rob(nums, i + 2, memo))\n    return memo[i]\n',
+            js: 'function rob(nums, i = 0, memo = new Map()) {\n  if (i >= nums.length) return 0;\n  if (memo.has(i)) return memo.get(i);\n  // At house i: skip it, or rob it plus the best from two houses on.\n  memo.set(i, Math.max(rob(nums, i + 1, memo), nums[i] + rob(nums, i + 2, memo)));\n  return memo.get(i);\n}\n',
+          },
+        },
+      ],
       tests: [
         { input: [[1, 2, 3, 1]], expected: 4 },
         { input: [[2, 7, 9, 3, 1]], expected: 12 },

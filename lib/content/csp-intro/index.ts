@@ -163,11 +163,11 @@ This is the "derive from state" idea: the winner is a pure function of the board
         { input: [[['O', '', ''], ['O', 'X', 'X'], ['O', '', '']]], expected: 'O' },
         { input: [[['X', 'O', ''], ['', 'X', 'O'], ['', '', 'X']]], expected: 'X' },
         { input: [[['', '', ''], ['', '', ''], ['', '', '']]], expected: '' },
-        // Anti-diagonal — the one winning line no other case exercises.
+        // Anti-diagonal: the one winning line no other case exercises.
         { input: [[['', '', 'O'], ['X', 'O', 'X'], ['O', '', '']]], expected: 'O' },
         // Full board *with* a winner: a winning line beats "Draw".
         { input: [[['X', 'X', 'X'], ['O', 'O', 'X'], ['X', 'O', 'O']]], expected: 'X' },
-        // One cell left and no line — still in progress, not a draw.
+        // One cell left and no line: still in progress, not a draw.
         { input: [[['X', 'O', 'X'], ['X', 'O', 'O'], ['O', 'X', '']]], expected: '' },
       ],
       hints: [

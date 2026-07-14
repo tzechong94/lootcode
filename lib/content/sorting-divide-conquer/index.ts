@@ -129,6 +129,16 @@ const topic: Topic = {
         py: 'def sort_array(nums):\n    if len(nums) <= 1:\n        return nums\n    mid = len(nums) // 2\n    left = sort_array(nums[:mid])\n    right = sort_array(nums[mid:])\n    merged = []\n    i = j = 0\n    while i < len(left) and j < len(right):\n        if left[i] <= right[j]:\n            merged.append(left[i])\n            i += 1\n        else:\n            merged.append(right[j])\n            j += 1\n    merged.extend(left[i:])\n    merged.extend(right[j:])\n    return merged\n',
         js: 'function sortArray(nums) {\n  if (nums.length <= 1) return nums;\n  const mid = Math.floor(nums.length / 2);\n  const left = sortArray(nums.slice(0, mid));\n  const right = sortArray(nums.slice(mid));\n  const merged = [];\n  let i = 0, j = 0;\n  while (i < left.length && j < right.length) {\n    if (left[i] <= right[j]) merged.push(left[i++]);\n    else merged.push(right[j++]);\n  }\n  while (i < left.length) merged.push(left[i++]);\n  while (j < right.length) merged.push(right[j++]);\n  return merged;\n}\n',
       },
+      referenceLabel: 'Recursive',
+      alternates: [
+        {
+          label: 'Iterative (bottom-up)',
+          code: {
+            py: 'def sort_array(nums):\n    arr = list(nums)\n    n = len(arr)\n    width = 1\n    while width < n:\n        # Merge every adjacent pair of sorted runs of this width.\n        for lo in range(0, n, 2 * width):\n            mid = min(lo + width, n)\n            hi = min(lo + 2 * width, n)\n            left = arr[lo:mid]\n            right = arr[mid:hi]\n            merged = []\n            i = j = 0\n            while i < len(left) and j < len(right):\n                if left[i] <= right[j]:\n                    merged.append(left[i])\n                    i += 1\n                else:\n                    merged.append(right[j])\n                    j += 1\n            merged.extend(left[i:])\n            merged.extend(right[j:])\n            arr[lo:hi] = merged\n        width *= 2\n    return arr\n',
+            js: 'function sortArray(nums) {\n  const arr = nums.slice();\n  const n = arr.length;\n  for (let width = 1; width < n; width *= 2) {\n    // Merge every adjacent pair of sorted runs of this width.\n    for (let lo = 0; lo < n; lo += 2 * width) {\n      const mid = Math.min(lo + width, n);\n      const hi = Math.min(lo + 2 * width, n);\n      const left = arr.slice(lo, mid);\n      const right = arr.slice(mid, hi);\n      const merged = [];\n      let i = 0, j = 0;\n      while (i < left.length && j < right.length) {\n        if (left[i] <= right[j]) merged.push(left[i++]);\n        else merged.push(right[j++]);\n      }\n      while (i < left.length) merged.push(left[i++]);\n      while (j < right.length) merged.push(right[j++]);\n      for (let k = 0; k < merged.length; k++) arr[lo + k] = merged[k];\n    }\n  }\n  return arr;\n}\n',
+          },
+        },
+      ],
       tests: [
         { input: [[5, 2, 3, 1]], expected: [1, 2, 3, 5] },
         { input: [[5, 1, 1, 2, 0, 0]], expected: [0, 0, 1, 1, 2, 5] },
@@ -197,6 +207,16 @@ const topic: Topic = {
         py: 'def mod_pow(base, exp, m):\n    result = 1 % m\n    base %= m\n    while exp > 0:\n        if exp & 1:\n            result = (result * base) % m\n        base = (base * base) % m\n        exp >>= 1\n    return result\n',
         js: 'function modPow(base, exp, m) {\n  let result = 1 % m;\n  base %= m;\n  while (exp > 0) {\n    if (exp & 1) result = (result * base) % m;\n    base = (base * base) % m;\n    exp = Math.floor(exp / 2);\n  }\n  return result;\n}\n',
       },
+      referenceLabel: 'Iterative',
+      alternates: [
+        {
+          label: 'Recursive',
+          code: {
+            py: 'def mod_pow(base, exp, m):\n    base %= m\n    if exp == 0:\n        return 1 % m\n    # x^n = (x^(n//2))², times one extra x when n is odd.\n    half = mod_pow(base, exp >> 1, m)\n    result = (half * half) % m\n    if exp & 1:\n        result = (result * base) % m\n    return result\n',
+            js: 'function modPow(base, exp, m) {\n  base %= m;\n  if (exp === 0) return 1 % m;\n  // x^n = (x^(n/2))², times one extra x when n is odd.\n  const half = modPow(base, Math.floor(exp / 2), m);\n  let result = (half * half) % m;\n  if (exp & 1) result = (result * base) % m;\n  return result;\n}\n',
+          },
+        },
+      ],
       tests: [
         { input: [2, 10, 1000], expected: 24 },
         { input: [3, 5, 100], expected: 43 },

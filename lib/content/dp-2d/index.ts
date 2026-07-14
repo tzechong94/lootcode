@@ -123,6 +123,34 @@ const topic: Topic = {
         py: 'def unique_paths(m, n):\n    dp = [1] * n\n    for _ in range(1, m):\n        for j in range(1, n):\n            dp[j] += dp[j - 1]\n    return dp[-1]\n',
         js: 'function uniquePaths(m, n) {\n  const dp = new Array(n).fill(1);\n  for (let i = 1; i < m; i++) {\n    for (let j = 1; j < n; j++) {\n      dp[j] += dp[j - 1];\n    }\n  }\n  return dp[n - 1];\n}\n',
       },
+      referenceLabel: 'Iterative (bottom-up)',
+      alternates: [
+        {
+          label: 'Recursive (memoized)',
+          code: {
+            py: `def unique_paths(m, n, memo=None):
+    if memo is None:
+        memo = {}
+    if m == 1 or n == 1:
+        return 1
+    if (m, n) in memo:
+        return memo[(m, n)]
+    # Reach the corner from the cell above (one fewer row) or the left (one fewer column).
+    memo[(m, n)] = unique_paths(m - 1, n, memo) + unique_paths(m, n - 1, memo)
+    return memo[(m, n)]
+`,
+            js: `function uniquePaths(m, n, memo = new Map()) {
+  if (m === 1 || n === 1) return 1;
+  const key = m + ',' + n;
+  if (memo.has(key)) return memo.get(key);
+  // Reach the corner from the cell above (one fewer row) or the left (one fewer column).
+  memo.set(key, uniquePaths(m - 1, n, memo) + uniquePaths(m, n - 1, memo));
+  return memo.get(key);
+}
+`,
+          },
+        },
+      ],
       tests: [
         { input: [3, 7], expected: 28 },
         { input: [3, 2], expected: 3 },
@@ -157,6 +185,53 @@ const topic: Topic = {
         py: 'def min_path_sum(grid):\n    rows, cols = len(grid), len(grid[0])\n    dp = [0] * cols\n    dp[0] = grid[0][0]\n    for j in range(1, cols):\n        dp[j] = dp[j - 1] + grid[0][j]\n    for i in range(1, rows):\n        dp[0] += grid[i][0]\n        for j in range(1, cols):\n            dp[j] = min(dp[j], dp[j - 1]) + grid[i][j]\n    return dp[-1]\n',
         js: 'function minPathSum(grid) {\n  const rows = grid.length, cols = grid[0].length;\n  const dp = new Array(cols).fill(0);\n  dp[0] = grid[0][0];\n  for (let j = 1; j < cols; j++) dp[j] = dp[j - 1] + grid[0][j];\n  for (let i = 1; i < rows; i++) {\n    dp[0] += grid[i][0];\n    for (let j = 1; j < cols; j++) {\n      dp[j] = Math.min(dp[j], dp[j - 1]) + grid[i][j];\n    }\n  }\n  return dp[cols - 1];\n}\n',
       },
+      referenceLabel: 'Iterative (bottom-up)',
+      alternates: [
+        {
+          label: 'Recursive (memoized)',
+          code: {
+            py: `def min_path_sum(grid):
+    memo = {}
+
+    def best(i, j):
+        if i == 0 and j == 0:
+            return grid[0][0]
+        if (i, j) in memo:
+            return memo[(i, j)]
+        # The cheapest way in comes from above (i-1) or from the left (j-1).
+        if i == 0:
+            cheapest = best(i, j - 1)
+        elif j == 0:
+            cheapest = best(i - 1, j)
+        else:
+            cheapest = min(best(i - 1, j), best(i, j - 1))
+        memo[(i, j)] = cheapest + grid[i][j]
+        return memo[(i, j)]
+
+    return best(len(grid) - 1, len(grid[0]) - 1)
+`,
+            js: `function minPathSum(grid) {
+  const memo = new Map();
+
+  function best(i, j) {
+    if (i === 0 && j === 0) return grid[0][0];
+    const key = i + ',' + j;
+    if (memo.has(key)) return memo.get(key);
+    // The cheapest way in comes from above (i-1) or from the left (j-1).
+    let cheapest;
+    if (i === 0) cheapest = best(i, j - 1);
+    else if (j === 0) cheapest = best(i - 1, j);
+    else cheapest = Math.min(best(i - 1, j), best(i, j - 1));
+    memo.set(key, cheapest + grid[i][j]);
+    return memo.get(key);
+  }
+
+  return best(grid.length - 1, grid[0].length - 1);
+}
+`,
+          },
+        },
+      ],
       tests: [
         { input: [[[1, 3, 1], [1, 5, 1], [4, 2, 1]]], expected: 7 },
         { input: [[[1, 2, 3], [4, 5, 6]]], expected: 12 },
@@ -191,6 +266,47 @@ const topic: Topic = {
         py: 'def longest_common_subsequence(a, b):\n    m, n = len(a), len(b)\n    dp = [[0] * (n + 1) for _ in range(m + 1)]\n    for i in range(1, m + 1):\n        for j in range(1, n + 1):\n            if a[i - 1] == b[j - 1]:\n                dp[i][j] = dp[i - 1][j - 1] + 1\n            else:\n                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])\n    return dp[m][n]\n',
         js: 'function longestCommonSubsequence(a, b) {\n  const m = a.length, n = b.length;\n  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));\n  for (let i = 1; i <= m; i++) {\n    for (let j = 1; j <= n; j++) {\n      if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;\n      else dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);\n    }\n  }\n  return dp[m][n];\n}\n',
       },
+      referenceLabel: 'Iterative (bottom-up)',
+      alternates: [
+        {
+          label: 'Recursive (memoized)',
+          code: {
+            py: `def longest_common_subsequence(a, b):
+    memo = {}
+
+    def lcs(i, j):
+        if i == 0 or j == 0:
+            return 0
+        if (i, j) in memo:
+            return memo[(i, j)]
+        # Matching characters extend the diagonal; otherwise drop one char from either side.
+        if a[i - 1] == b[j - 1]:
+            memo[(i, j)] = lcs(i - 1, j - 1) + 1
+        else:
+            memo[(i, j)] = max(lcs(i - 1, j), lcs(i, j - 1))
+        return memo[(i, j)]
+
+    return lcs(len(a), len(b))
+`,
+            js: `function longestCommonSubsequence(a, b) {
+  const memo = new Map();
+
+  function lcs(i, j) {
+    if (i === 0 || j === 0) return 0;
+    const key = i + ',' + j;
+    if (memo.has(key)) return memo.get(key);
+    // Matching characters extend the diagonal; otherwise drop one char from either side.
+    if (a[i - 1] === b[j - 1]) memo.set(key, lcs(i - 1, j - 1) + 1);
+    else memo.set(key, Math.max(lcs(i - 1, j), lcs(i, j - 1)));
+    return memo.get(key);
+  }
+
+  return lcs(a.length, b.length);
+}
+`,
+          },
+        },
+      ],
       tests: [
         { input: ['abcde', 'ace'], expected: 3 },
         { input: ['abc', 'abc'], expected: 3 },
@@ -225,6 +341,50 @@ const topic: Topic = {
         py: 'def min_distance(word1, word2):\n    m, n = len(word1), len(word2)\n    dp = [[0] * (n + 1) for _ in range(m + 1)]\n    for i in range(m + 1):\n        dp[i][0] = i\n    for j in range(n + 1):\n        dp[0][j] = j\n    for i in range(1, m + 1):\n        for j in range(1, n + 1):\n            if word1[i - 1] == word2[j - 1]:\n                dp[i][j] = dp[i - 1][j - 1]\n            else:\n                dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])\n    return dp[m][n]\n',
         js: 'function minDistance(word1, word2) {\n  const m = word1.length, n = word2.length;\n  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));\n  for (let i = 0; i <= m; i++) dp[i][0] = i;\n  for (let j = 0; j <= n; j++) dp[0][j] = j;\n  for (let i = 1; i <= m; i++) {\n    for (let j = 1; j <= n; j++) {\n      if (word1[i - 1] === word2[j - 1]) dp[i][j] = dp[i - 1][j - 1];\n      else dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);\n    }\n  }\n  return dp[m][n];\n}\n',
       },
+      referenceLabel: 'Iterative (bottom-up)',
+      alternates: [
+        {
+          label: 'Recursive (memoized)',
+          code: {
+            py: `def min_distance(word1, word2):
+    memo = {}
+
+    def edits(i, j):
+        # An empty prefix on either side costs one insert/delete per remaining char.
+        if i == 0:
+            return j
+        if j == 0:
+            return i
+        if (i, j) in memo:
+            return memo[(i, j)]
+        if word1[i - 1] == word2[j - 1]:
+            memo[(i, j)] = edits(i - 1, j - 1)
+        else:
+            memo[(i, j)] = 1 + min(edits(i - 1, j), edits(i, j - 1), edits(i - 1, j - 1))
+        return memo[(i, j)]
+
+    return edits(len(word1), len(word2))
+`,
+            js: `function minDistance(word1, word2) {
+  const memo = new Map();
+
+  function edits(i, j) {
+    // An empty prefix on either side costs one insert/delete per remaining char.
+    if (i === 0) return j;
+    if (j === 0) return i;
+    const key = i + ',' + j;
+    if (memo.has(key)) return memo.get(key);
+    if (word1[i - 1] === word2[j - 1]) memo.set(key, edits(i - 1, j - 1));
+    else memo.set(key, 1 + Math.min(edits(i - 1, j), edits(i, j - 1), edits(i - 1, j - 1)));
+    return memo.get(key);
+  }
+
+  return edits(word1.length, word2.length);
+}
+`,
+          },
+        },
+      ],
       tests: [
         { input: ['horse', 'ros'], expected: 3 },
         { input: ['intention', 'execution'], expected: 5 },

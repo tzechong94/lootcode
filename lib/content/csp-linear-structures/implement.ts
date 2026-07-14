@@ -275,7 +275,7 @@ class Deque {
         ],
       },
       {
-        // Mirror of 'drain then refill', which only ever empties via popBack — so a
+        // Mirror of 'drain then refill', which only ever empties via popBack, so a
         // popFront that forgets to clear tail goes unnoticed.
         name: 'drain from the front, then refill',
         ops: [

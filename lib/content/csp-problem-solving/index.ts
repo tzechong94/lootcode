@@ -61,6 +61,33 @@ Try tiny cases first: \`n = 1\` has 1 way, \`n = 2\` has 2 (1+1 or 2), \`n = 3\`
 }
 `,
       },
+      referenceLabel: 'Iterative',
+      alternates: [
+        {
+          label: 'Recursive (memoized)',
+          code: {
+            py: `def count_ways(n, memo=None):
+    if memo is None:
+        memo = {}
+    if n <= 1:
+        return 1
+    if n in memo:
+        return memo[n]
+    # Reach step n from n-1 (one step) or n-2 (two steps).
+    memo[n] = count_ways(n - 1, memo) + count_ways(n - 2, memo)
+    return memo[n]
+`,
+            js: `function countWays(n, memo = new Map()) {
+  if (n <= 1) return 1;
+  if (memo.has(n)) return memo.get(n);
+  // Reach step n from n-1 (one step) or n-2 (two steps).
+  memo.set(n, countWays(n - 1, memo) + countWays(n - 2, memo));
+  return memo.get(n);
+}
+`,
+          },
+        },
+      ],
       tests: [
         { input: [0], expected: 1 },
         { input: [1], expected: 1 },
@@ -70,7 +97,7 @@ Try tiny cases first: \`n = 1\` has 1 way, \`n = 2\` has 2 (1+1 or 2), \`n = 3\`
         { input: [5], expected: 8 },
         { input: [10], expected: 89 },
         { input: [20], expected: 10946 },
-        // One below the top bound — catches an off-by-one in the loop's upper limit.
+        // One below the top bound: catches an off-by-one in the loop's upper limit.
         { input: [39], expected: 102334155 },
         // Upper constraint boundary (n ≤ 40): the largest legal answer.
         { input: [40], expected: 165580141 },
@@ -141,7 +168,7 @@ The trick is to plan first: list the values (including the subtractive forms lik
         { input: [2023], expected: 'MMXXIII' },
         { input: [3999], expected: 'MMMCMXCIX' },
         { input: [1], expected: 'I' },
-        // CD and CM standalone — 1994 never uses CD, so a missing entry emits "CCCC".
+        // CD and CM standalone: 1994 never uses CD, so a missing entry emits "CCCC".
         { input: [400], expected: 'CD' },
         { input: [900], expected: 'CM' },
         { input: [44], expected: 'XLIV' },
@@ -199,6 +226,36 @@ The first bug-free binary search wasn't published until 16 years after the first
 }
 `,
       },
+      referenceLabel: 'Iterative',
+      alternates: [
+        {
+          label: 'Recursive',
+          code: {
+            py: `def search(nums, target, lo=0, hi=None):
+    if hi is None:
+        hi = len(nums) - 1
+    # Same invariant as the loop: if target exists, it is inside [lo, hi].
+    if lo > hi:
+        return -1
+    mid = (lo + hi) // 2
+    if nums[mid] == target:
+        return mid
+    if nums[mid] < target:
+        return search(nums, target, mid + 1, hi)
+    return search(nums, target, lo, mid - 1)
+`,
+            js: `function search(nums, target, lo = 0, hi = nums.length - 1) {
+  // Same invariant as the loop: if target exists, it is inside [lo, hi].
+  if (lo > hi) return -1;
+  const mid = Math.floor((lo + hi) / 2);
+  if (nums[mid] === target) return mid;
+  if (nums[mid] < target) return search(nums, target, mid + 1, hi);
+  return search(nums, target, lo, mid - 1);
+}
+`,
+          },
+        },
+      ],
       tests: [
         { input: [[1, 2, 3, 4, 5], 3], expected: 2 },
         { input: [[1, 2, 3, 4, 5], 6], expected: -1 },
@@ -208,9 +265,9 @@ The first bug-free binary search wasn't published until 16 years after the first
         { input: [[1, 3, 5, 7, 9], 1], expected: 0 },
         { input: [[2, 4, 6, 8], 5], expected: -1 },
         { input: [[5], 3], expected: -1 },
-        // Two elements, target at the top: mid always lands on lo — the classic non-termination trap.
+        // Two elements, target at the top: mid always lands on lo, the classic non-termination trap.
         { input: [[1, 2], 2], expected: 1 },
-        // Target below the minimum — the miss direction no other case covers.
+        // Target below the minimum: the miss direction no other case covers.
         { input: [[2, 4, 6, 8], 1], expected: -1 },
         { input: [[1, 2, 3, 4], 4], expected: 3 },
         { input: [[-10, -3, 0, 7], -10], expected: 0 },

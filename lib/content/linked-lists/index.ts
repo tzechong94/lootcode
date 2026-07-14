@@ -250,6 +250,16 @@ const topic: Topic = {
         py: 'def merge_two_lists(a, b):\n    l1 = build_list(a)\n    l2 = build_list(b)\n    dummy = ListNode()\n    tail = dummy\n    while l1 and l2:\n        if l1.val <= l2.val:\n            tail.next = l1\n            l1 = l1.next\n        else:\n            tail.next = l2\n            l2 = l2.next\n        tail = tail.next\n    tail.next = l1 if l1 else l2\n    return to_array(dummy.next)\n',
         js: 'function mergeTwoLists(a, b) {\n  let l1 = buildList(a);\n  let l2 = buildList(b);\n  const dummy = new ListNode();\n  let tail = dummy;\n  while (l1 && l2) {\n    if (l1.val <= l2.val) {\n      tail.next = l1;\n      l1 = l1.next;\n    } else {\n      tail.next = l2;\n      l2 = l2.next;\n    }\n    tail = tail.next;\n  }\n  tail.next = l1 ? l1 : l2;\n  return toArray(dummy.next);\n}\n',
       },
+      referenceLabel: 'Iterative (dummy head)',
+      alternates: [
+        {
+          label: 'Recursive',
+          code: {
+            py: 'def merge_two_lists(a, b):\n    l1 = build_list(a)\n    l2 = build_list(b)\n    def merge(p, q):\n        # An empty list contributes nothing: the other list is the answer.\n        if not p:\n            return q\n        if not q:\n            return p\n        if p.val <= q.val:\n            p.next = merge(p.next, q)\n            return p\n        q.next = merge(p, q.next)\n        return q\n    return to_array(merge(l1, l2))\n',
+            js: 'function mergeTwoLists(a, b) {\n  const l1 = buildList(a);\n  const l2 = buildList(b);\n  function merge(p, q) {\n    // An empty list contributes nothing: the other list is the answer.\n    if (!p) return q;\n    if (!q) return p;\n    if (p.val <= q.val) {\n      p.next = merge(p.next, q);\n      return p;\n    }\n    q.next = merge(p, q.next);\n    return q;\n  }\n  return toArray(merge(l1, l2));\n}\n',
+          },
+        },
+      ],
       tests: [
         { input: [[1, 2, 4], [1, 3, 4]], expected: [1, 1, 2, 3, 4, 4] },
         { input: [[], []], expected: [] },

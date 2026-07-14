@@ -128,6 +128,16 @@ const topic: Topic = {
         py: 'def search(nums, target):\n    lo, hi = 0, len(nums) - 1\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        if nums[mid] == target:\n            return mid\n        elif nums[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return -1\n',
         js: 'function search(nums, target) {\n  let lo = 0, hi = nums.length - 1;\n  while (lo <= hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if (nums[mid] === target) return mid;\n    else if (nums[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return -1;\n}\n',
       },
+      referenceLabel: 'Iterative',
+      alternates: [
+        {
+          label: 'Recursive',
+          code: {
+            py: 'def search(nums, target):\n    def go(lo, hi):\n        # Empty range: the target was never inside the invariant range.\n        if lo > hi:\n            return -1\n        mid = (lo + hi) // 2\n        if nums[mid] == target:\n            return mid\n        elif nums[mid] < target:\n            return go(mid + 1, hi)\n        else:\n            return go(lo, mid - 1)\n    return go(0, len(nums) - 1)\n',
+            js: 'function search(nums, target) {\n  function go(lo, hi) {\n    // Empty range: the target was never inside the invariant range.\n    if (lo > hi) return -1;\n    const mid = Math.floor((lo + hi) / 2);\n    if (nums[mid] === target) return mid;\n    else if (nums[mid] < target) return go(mid + 1, hi);\n    else return go(lo, mid - 1);\n  }\n  return go(0, nums.length - 1);\n}\n',
+          },
+        },
+      ],
       tests: [
         { input: [[-1, 0, 3, 5, 9, 12], 9], expected: 4 },
         { input: [[-1, 0, 3, 5, 9, 12], 2], expected: -1 },
