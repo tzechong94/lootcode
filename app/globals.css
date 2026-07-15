@@ -126,7 +126,21 @@ pre code { background: none; padding: 0; }
 
 /* ---------- Problem workspace ---------- */
 .workspace { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
-@media (max-width: 1000px) { .workspace { grid-template-columns: 1fr; } }
+/* Both columns pin to the viewport and scroll independently, so reading down to the
+   reference solution never moves the editor. */
+.problem-statement {
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  /* Keep text off the scrollbar. */
+  padding-right: 12px;
+}
+/* One column on narrow screens, where pinning and capping the height only get in the way. */
+@media (max-width: 1000px) {
+  .workspace { grid-template-columns: 1fr; }
+  .problem-statement, .editor-col { position: static; max-height: none; overflow: visible; padding-right: 0; }
+}
 
 .problem-statement h2 { font-size: 20px; margin: 0 0 4px; }
 .diff-pill { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px; font-weight: 600; }

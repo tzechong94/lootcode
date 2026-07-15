@@ -22,10 +22,45 @@ const MAX_OUT_LINES = 200;
 const MAX_OUT_CHARS = 10000;
 const TRUNC_NOTE = '… output truncated';
 
+// Time limits are per test case, not per run: a solution that is fast enough for the
+// small cases still passes them when one large case runs out of time.
 const JS_TIMEOUT_MS = 5000;
 // Pyodide interprets Python in WASM and runs several times slower than native JS,
 // so a correct solution needs more headroom than the JS limit gives it.
 const PY_TIMEOUT_MS = 10000;
+// Code that hangs usually hangs on every case. Once this many time out in a row,
+// stop paying the limit again for each remaining case.
+const MAX_CONSECUTIVE_TIMEOUTS = 2;
+const SKIPPED_NOTE = 'skipped (earlier cases hit the time limit)';
+
+/**
+ * Run each case under its own time limit. `runOne` resolves to null when that case ran
+ * out of time, which is the only thing this driver treats as a timeout.
+ */
+async function runEachCase<T, R>(
+  items: T[],
+  runOne: (item: T) => Promise<R | null>,
+  onTimeout: () => R,
+  onSkipped: () => R,
+): Promise<R[]> {
+  const out: R[] = [];
+  let streak = 0;
+  for (const item of items) {
+    if (streak >= MAX_CONSECUTIVE_TIMEOUTS) {
+      out.push(onSkipped());
+      continue;
+    }
+    const r = await runOne(item);
+    if (r === null) {
+      streak += 1;
+      out.push(onTimeout());
+    } else {
+      streak = 0;
+      out.push(r);
+    }
+  }
+  return out;
+}
 const PYODIDE_VERSION = '0.26.2';
 const PYODIDE_BASE = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/`;
 
@@ -63,60 +98,68 @@ function __startCapture() { __cap = { lines: [], chars: 0, cut: false }; }
 function __endCapture() { var c = __cap; __cap = null; return c ? c.lines.join('\\n') : ''; }
 `;
 
+// One case per worker: a case that never returns can then be killed on its own, and
+// each case starts from clean globals rather than inheriting the previous one's.
 const WORKER_SOURCE = `
 ${CAPTURE_JS}
 self.onmessage = (e) => {
   'use strict';
-  const { code, fnName, inputs } = e.data;
-  let results = [];
+  const { code, fnName, input } = e.data;
+  let fn;
   try {
-    const fn = (new Function(code + '\\n; return ' + fnName + ';'))();
+    fn = (new Function(code + '\\n; return ' + fnName + ';'))();
     if (typeof fn !== 'function') throw new Error('No function named ' + fnName + ' was defined.');
-    for (const input of inputs) {
-      __startCapture();
-      try {
-        const value = fn.apply(null, JSON.parse(JSON.stringify(input)));
-        results.push({ ok: true, value: value, stdout: __endCapture() });
-      } catch (err) {
-        results.push({ ok: false, error: (err && err.message) ? err.message : String(err), stdout: __endCapture() });
-      }
-    }
   } catch (err) {
-    const msg = 'Compile error: ' + ((err && err.message) ? err.message : String(err));
-    results = inputs.map(function () { return { ok: false, error: msg }; });
+    self.postMessage({ ok: false, error: 'Compile error: ' + ((err && err.message) ? err.message : String(err)) });
+    return;
   }
-  self.postMessage(results);
+  __startCapture();
+  try {
+    const value = fn.apply(null, JSON.parse(JSON.stringify(input)));
+    self.postMessage({ ok: true, value: value, stdout: __endCapture() });
+  } catch (err) {
+    self.postMessage({ ok: false, error: (err && err.message) ? err.message : String(err), stdout: __endCapture() });
+  }
 };
 `;
 
-function runJs(code: string, fnName: string, tests: TestCase[]): Promise<RawResult[]> {
+/** Resolves to null if this case exceeded the limit. */
+function runJsCase(code: string, fnName: string, input: unknown[]): Promise<RawResult | null> {
   return new Promise((resolve) => {
-    const blob = new Blob([WORKER_SOURCE], { type: 'application/javascript' });
-    const url = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(new Blob([WORKER_SOURCE], { type: 'application/javascript' }));
     const worker = new Worker(url);
-    const inputs = tests.map((t) => t.input);
+    const done = () => {
+      worker.terminate();
+      URL.revokeObjectURL(url);
+    };
 
     const timer = setTimeout(() => {
-      worker.terminate();
-      URL.revokeObjectURL(url);
-      resolve(tests.map(() => ({ ok: false, error: `Time limit exceeded (${JS_TIMEOUT_MS}ms)` })));
+      done();
+      resolve(null);
     }, JS_TIMEOUT_MS);
 
-    worker.onmessage = (e: MessageEvent<RawResult[]>) => {
+    worker.onmessage = (e: MessageEvent<RawResult>) => {
       clearTimeout(timer);
-      worker.terminate();
-      URL.revokeObjectURL(url);
+      done();
       resolve(e.data);
     };
     worker.onerror = (e) => {
       clearTimeout(timer);
-      worker.terminate();
-      URL.revokeObjectURL(url);
-      resolve(tests.map(() => ({ ok: false, error: e.message || 'Worker error' })));
+      done();
+      resolve({ ok: false, error: e.message || 'Worker error' });
     };
 
-    worker.postMessage({ code, fnName, inputs });
+    worker.postMessage({ code, fnName, input });
   });
+}
+
+function runJs(code: string, fnName: string, tests: TestCase[]): Promise<RawResult[]> {
+  return runEachCase<unknown[], RawResult>(
+    tests.map((t) => t.input),
+    (input) => runJsCase(code, fnName, input),
+    () => ({ ok: false, error: `Time limit exceeded (${JS_TIMEOUT_MS}ms)` }),
+    () => ({ ok: false, error: SKIPPED_NOTE }),
+  );
 }
 
 // ---------- Python: Pyodide (WASM) in a sandboxed Web Worker ----------
@@ -219,16 +262,16 @@ function bootPyWorker(): Promise<PyWorkerHandle> {
  * Kill the worker outright: the only way to stop Python code that will not yield.
  * Any other in-flight job dies with it, so settle them all rather than let them hang.
  */
-function killPyWorker(handle: PyWorkerHandle, reason: string): void {
+function killPyWorker(handle: PyWorkerHandle, reason: string, timedOut = false): void {
   handle.worker.terminate();
   URL.revokeObjectURL(handle.url);
   pyWorkerPromise = null;
   const orphaned = [...handle.jobs.values()];
   handle.jobs.clear();
-  for (const settle of orphaned) settle({ ok: false, error: reason });
+  for (const settle of orphaned) settle({ ok: false, error: reason, timedOut });
 }
 
-type PyRun = { ok: true; result: string } | { ok: false; error: string };
+type PyRun = { ok: true; result: string } | { ok: false; error: string; timedOut?: boolean };
 
 /**
  * Run one Python harness to completion, or kill the worker if it exceeds the time limit.
@@ -245,8 +288,8 @@ async function runPyHarness(code: string, globalName: string, globalValue: strin
   const id = ++pyJobId;
   return new Promise<PyRun>((resolve) => {
     const timer = setTimeout(() => {
-      // The next run pays the Pyodide load again, but that beats a wedged tab.
-      killPyWorker(handle, `Time limit exceeded (${PY_TIMEOUT_MS}ms)`);
+      // The next case pays the Pyodide load again, but that beats a wedged tab.
+      killPyWorker(handle, `Time limit exceeded (${PY_TIMEOUT_MS}ms)`, true);
     }, PY_TIMEOUT_MS);
 
     handle.jobs.set(id, (r) => {
@@ -257,7 +300,7 @@ async function runPyHarness(code: string, globalName: string, globalValue: strin
   });
 }
 
-async function runPy(code: string, fnName: string, tests: TestCase[]): Promise<RawResult[]> {
+function runPy(code: string, fnName: string, tests: TestCase[]): Promise<RawResult[]> {
   const harness = `
 import json as __json
 import io as __io
@@ -265,25 +308,30 @@ import contextlib as __ctx
 def __clip(s):
     return s if len(s) <= ${MAX_OUT_CHARS} else s[:${MAX_OUT_CHARS}] + "\\n${TRUNC_NOTE}"
 ${code}
-__data = __json.loads(__lootcode_inputs)
-__out = []
-for __tc in __data:
-    __buf = __io.StringIO()
-    try:
-        with __ctx.redirect_stdout(__buf):
-            __v = ${fnName}(*__tc)
-        __out.append({"ok": True, "value": __v, "stdout": __clip(__buf.getvalue())})
-    except Exception as __e:
-        __out.append({"ok": False, "error": str(__e), "stdout": __clip(__buf.getvalue())})
+__tc = __json.loads(__lootcode_input)
+__buf = __io.StringIO()
+try:
+    with __ctx.redirect_stdout(__buf):
+        __v = ${fnName}(*__tc)
+    __out = {"ok": True, "value": __v, "stdout": __clip(__buf.getvalue())}
+except Exception as __e:
+    __out = {"ok": False, "error": str(__e), "stdout": __clip(__buf.getvalue())}
 __json.dumps(__out)
 `;
-  const run = await runPyHarness(harness, '__lootcode_inputs', JSON.stringify(tests.map((t) => t.input)));
-  if (!run.ok) return tests.map(() => ({ ok: false, error: run.error }));
-  try {
-    return JSON.parse(run.result) as RawResult[];
-  } catch {
-    return tests.map(() => ({ ok: false, error: 'Could not read harness output.' }));
-  }
+  return runEachCase<unknown[], RawResult>(
+    tests.map((t) => t.input),
+    async (input) => {
+      const run = await runPyHarness(harness, '__lootcode_input', JSON.stringify(input));
+      if (!run.ok) return run.timedOut ? null : { ok: false, error: run.error };
+      try {
+        return JSON.parse(run.result) as RawResult;
+      } catch {
+        return { ok: false, error: 'Could not read harness output.' };
+      }
+    },
+    () => ({ ok: false, error: `Time limit exceeded (${PY_TIMEOUT_MS}ms)` }),
+    () => ({ ok: false, error: SKIPPED_NOTE }),
+  );
 }
 
 // ---------- Unified entry point ----------
@@ -356,21 +404,22 @@ function resolveAliases(impl: Implementation, lang: Lang): DsTestCase[] {
 }
 
 // JS worker: build the class, then run each test case's op sequence on a fresh instance.
+// One op-sequence per worker, for the same reason as WORKER_SOURCE above.
 const IMPL_WORKER_SOURCE = `
 ${CAPTURE_JS}
 self.onmessage = (e) => {
   'use strict';
-  const { code, className, cases } = e.data;
+  const { code, className, testCase } = e.data;
   let Cls;
   try {
     Cls = (new Function(code + '\\n; return ' + className + ';'))();
     if (typeof Cls !== 'function') throw new Error('No class named ' + className + ' was defined.');
   } catch (err) {
     const msg = 'Compile error: ' + ((err && err.message) ? err.message : String(err));
-    self.postMessage(cases.map(function (c) { return c.ops.map(function () { return { ok: false, error: msg }; }); }));
+    self.postMessage(testCase.ops.map(function () { return { ok: false, error: msg }; }));
     return;
   }
-  const out = cases.map(function (c) {
+  const out = (function (c) {
     let inst;
     let constructed = false;
     let dead = false;
@@ -393,43 +442,51 @@ self.onmessage = (e) => {
         return { ok: false, error: (err && err.message) ? err.message : String(err), stdout: __endCapture() };
       }
     });
-  });
+  })(testCase);
   self.postMessage(out);
 };
 `;
 
-function runJsImpl(code: string, className: string, cases: DsTestCase[]): Promise<OpResult[][]> {
+/** Resolves to null if this op-sequence exceeded the limit. */
+function runJsImplCase(code: string, className: string, testCase: DsTestCase): Promise<OpResult[] | null> {
   return new Promise((resolve) => {
-    const blob = new Blob([IMPL_WORKER_SOURCE], { type: 'application/javascript' });
-    const url = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(new Blob([IMPL_WORKER_SOURCE], { type: 'application/javascript' }));
     const worker = new Worker(url);
-
-    const fail = (msg: string) => cases.map((c) => c.ops.map(() => ({ ok: false, error: msg })));
-    const timer = setTimeout(() => {
+    const done = () => {
       worker.terminate();
       URL.revokeObjectURL(url);
-      resolve(fail(`Time limit exceeded (${JS_TIMEOUT_MS}ms)`));
+    };
+
+    const timer = setTimeout(() => {
+      done();
+      resolve(null);
     }, JS_TIMEOUT_MS);
 
-    worker.onmessage = (e: MessageEvent<OpResult[][]>) => {
+    worker.onmessage = (e: MessageEvent<OpResult[]>) => {
       clearTimeout(timer);
-      worker.terminate();
-      URL.revokeObjectURL(url);
+      done();
       resolve(e.data);
     };
     worker.onerror = (e) => {
       clearTimeout(timer);
-      worker.terminate();
-      URL.revokeObjectURL(url);
-      resolve(fail(e.message || 'Worker error'));
+      done();
+      resolve(testCase.ops.map(() => ({ ok: false, error: e.message || 'Worker error' })));
     };
 
-    worker.postMessage({ code, className, cases });
+    worker.postMessage({ code, className, testCase });
   });
 }
 
-async function runPyImpl(code: string, className: string, cases: DsTestCase[]): Promise<OpResult[][]> {
-  const fail = (msg: string) => cases.map((c) => c.ops.map(() => ({ ok: false, error: msg })));
+function runJsImpl(code: string, className: string, cases: DsTestCase[]): Promise<OpResult[][]> {
+  return runEachCase<DsTestCase, OpResult[]>(
+    cases,
+    (c) => runJsImplCase(code, className, c),
+    () => [{ ok: false, error: `Time limit exceeded (${JS_TIMEOUT_MS}ms)` }],
+    () => [{ ok: false, error: SKIPPED_NOTE }],
+  );
+}
+
+function runPyImpl(code: string, className: string, cases: DsTestCase[]): Promise<OpResult[][]> {
   const harness = `
 import json as __json
 import io as __io
@@ -437,51 +494,55 @@ import contextlib as __ctx
 def __clip(s):
     return s if len(s) <= ${MAX_OUT_CHARS} else s[:${MAX_OUT_CHARS}] + "\\n${TRUNC_NOTE}"
 ${code}
-__cases = __json.loads(__lootcode_cases)
-__out = []
-for __c in __cases:
-    __inst = None
-    __constructed = False
-    __dead = False
-    __ops = []
-    for __op in __c["ops"]:
-        if __dead:
-            __ops.append({"ok": False, "error": "skipped (earlier op failed)"})
-            continue
-        __buf = __io.StringIO()
+__c = __json.loads(__lootcode_case)
+__inst = None
+__constructed = False
+__dead = False
+__ops = []
+for __op in __c["ops"]:
+    if __dead:
+        __ops.append({"ok": False, "error": "skipped (earlier op failed)"})
+        continue
+    __buf = __io.StringIO()
+    try:
+        __args = __op.get("args", []) or []
+        with __ctx.redirect_stdout(__buf):
+            if __op["call"] == "new":
+                __inst = ${className}(*__args)
+                __constructed = True
+                __ops.append({"ok": True, "stdout": __clip(__buf.getvalue())})
+                continue
+            if not __constructed:
+                __inst = ${className}()
+                __constructed = True
+            __m = getattr(__inst, __op["call"], None)
+            if not callable(__m):
+                raise Exception("no method " + __op["call"])
+            __v = __m(*__args)
         try:
-            __args = __op.get("args", []) or []
-            with __ctx.redirect_stdout(__buf):
-                if __op["call"] == "new":
-                    __inst = ${className}(*__args)
-                    __constructed = True
-                    __ops.append({"ok": True, "stdout": __clip(__buf.getvalue())})
-                    continue
-                if not __constructed:
-                    __inst = ${className}()
-                    __constructed = True
-                __m = getattr(__inst, __op["call"], None)
-                if not callable(__m):
-                    raise Exception("no method " + __op["call"])
-                __v = __m(*__args)
-            try:
-                __json.dumps(__v)
-            except TypeError:
-                __v = str(__v)
-            __ops.append({"ok": True, "value": __v, "stdout": __clip(__buf.getvalue())})
-        except Exception as __e:
-            __dead = True
-            __ops.append({"ok": False, "error": str(__e), "stdout": __clip(__buf.getvalue())})
-    __out.append(__ops)
-__json.dumps(__out)
+            __json.dumps(__v)
+        except TypeError:
+            __v = str(__v)
+        __ops.append({"ok": True, "value": __v, "stdout": __clip(__buf.getvalue())})
+    except Exception as __e:
+        __dead = True
+        __ops.append({"ok": False, "error": str(__e), "stdout": __clip(__buf.getvalue())})
+__json.dumps(__ops)
 `;
-  const run = await runPyHarness(harness, '__lootcode_cases', JSON.stringify(cases));
-  if (!run.ok) return fail(run.error);
-  try {
-    return JSON.parse(run.result) as OpResult[][];
-  } catch {
-    return fail('Could not read harness output.');
-  }
+  return runEachCase<DsTestCase, OpResult[]>(
+    cases,
+    async (c) => {
+      const run = await runPyHarness(harness, '__lootcode_case', JSON.stringify(c));
+      if (!run.ok) return run.timedOut ? null : c.ops.map(() => ({ ok: false, error: run.error }));
+      try {
+        return JSON.parse(run.result) as OpResult[];
+      } catch {
+        return c.ops.map(() => ({ ok: false, error: 'Could not read harness output.' }));
+      }
+    },
+    () => [{ ok: false, error: `Time limit exceeded (${PY_TIMEOUT_MS}ms)` }],
+    () => [{ ok: false, error: SKIPPED_NOTE }],
+  );
 }
 
 export async function runImplementation(

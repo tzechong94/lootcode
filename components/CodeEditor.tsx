@@ -34,6 +34,10 @@ export default function CodeEditor({
           tabSize: lang === 'py' ? 4 : 2,
           automaticLayout: true,
           padding: { top: 12, bottom: 12 },
+          // The suggest/hover popups are rendered inside the editor, so `.editor-box`'s
+          // `overflow: hidden` clips them to a sliver. This re-parents them so they can
+          // escape the box.
+          fixedOverflowWidgets: true,
         }}
       />
     </div>
